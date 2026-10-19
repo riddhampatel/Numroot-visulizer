@@ -1,5 +1,5 @@
 import React from 'react';
-import { Download, Table as TableIcon, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { Download, Table as TableIcon, CheckCircle2, AlertTriangle, FunctionSquare } from 'lucide-react';
 
 export default function IterationTable({
   result,
@@ -9,7 +9,11 @@ export default function IterationTable({
 }) {
   if (!result) return null;
 
-  const { steps = [], root, converged, iterations, error, tolerance } = result;
+  const { steps = [], root, converged, iterations, error, tolerance, derivativeFormula } = result;
+  const isBisection = methodName.toLowerCase().includes('bisection');
+  const isRegulaFalsi = methodName.toLowerCase().includes('regula');
+  const isNewton = methodName.toLowerCase().includes('newton');
+  const isSecant = methodName.toLowerCase().includes('secant');
 
   const handleExportCSV = () => {
     if (!steps.length) return;
@@ -17,8 +21,8 @@ export default function IterationTable({
     let headers = [];
     let rows = [];
 
-    if (methodName.toLowerCase().includes('bisection')) {
-      headers = ['Iteration', 'a (Lower)', 'b (Upper)', 'c (Midpoint)', 'f(a)', 'f(b)', 'f(c)', 'Abs Error', 'Rel Error (%)'];
+    if (isBisection || isRegulaFalsi) {
+      headers = ['Iteration (n)', 'a_n', 'b_n', 'c_n', 'f(a_n)', 'f(b_n)', 'f(c_n)', 'Abs Error', 'Rel Error (%)'];
       rows = steps.map((s) => [
         s.iteration,
         s.a.toFixed(8),
@@ -28,10 +32,10 @@ export default function IterationTable({
         s.fb.toExponential(4),
         s.fc.toExponential(4),
         s.error.toExponential(6),
-        s.relativeError.toFixed(4)
+        s.relativeError !== null && s.relativeError !== undefined ? s.relativeError.toFixed(4) : 'N/A'
       ]);
-    } else {
-      headers = ['Iteration', 'x_k', 'f(x_k)', "f'(x_k)", 'x_{k+1}', 'Abs Error', 'Rel Error (%)'];
+    } else if (isNewton) {
+      headers = ['Iteration (n)', 'x_n', 'f(x_n)', "f'(x_n)", 'x_{n+1}', 'Abs Error', 'Rel Error (%)'];
       rows = steps.map((s) => [
         s.iteration,
         s.xk.toFixed(8),
@@ -39,7 +43,19 @@ export default function IterationTable({
         s.dfxk.toExponential(4),
         s.xNext.toFixed(8),
         s.error.toExponential(6),
-        s.relativeError.toFixed(4)
+        s.relativeError !== null && s.relativeError !== undefined ? s.relativeError.toFixed(4) : 'N/A'
+      ]);
+    } else if (isSecant) {
+      headers = ['Iteration (n)', 'x_{n-1}', 'x_n', 'f(x_{n-1})', 'f(x_n)', 'x_{n+1}', 'Abs Error', 'Rel Error (%)'];
+      rows = steps.map((s) => [
+        s.iteration,
+        s.xPrev.toFixed(8),
+        s.xCurr.toFixed(8),
+        s.fPrev.toExponential(4),
+        s.fCurr.toExponential(4),
+        s.xNext.toFixed(8),
+        s.error.toExponential(6),
+        s.relativeError !== null && s.relativeError !== undefined ? s.relativeError.toFixed(4) : 'N/A'
       ]);
     }
 
@@ -91,6 +107,35 @@ export default function IterationTable({
         </button>
       </div>
 
+      {/* Derivative Formula Display (For Newton-Raphson) */}
+      {derivativeFormula && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          padding: '8px 14px',
+          background: 'rgba(99, 102, 241, 0.08)',
+          border: '1px solid rgba(99, 102, 241, 0.25)',
+          borderRadius: '8px',
+          marginBottom: '14px',
+          fontSize: '0.82rem',
+          color: '#c7d2fe'
+        }}>
+          <FunctionSquare size={16} color="#818cf8" />
+          <span>Analytical Derivative:</span>
+          <code style={{
+            fontFamily: 'var(--font-mono)',
+            fontWeight: 700,
+            color: '#a5b4fc',
+            background: 'rgba(0,0,0,0.25)',
+            padding: '2px 8px',
+            borderRadius: '4px'
+          }}>
+            f'(x) = {derivativeFormula}
+          </code>
+        </div>
+      )}
+
       {/* Metrics Banner */}
       <div style={{
         display: 'grid',
@@ -126,7 +171,7 @@ export default function IterationTable({
             {result.finalResidual !== undefined && !isNaN(result.finalResidual)
               ? result.finalResidual.toExponential(4)
               : (steps.length > 0
-                  ? Math.abs(steps[steps.length - 1].fc ?? steps[steps.length - 1].fxk ?? 0).toExponential(4)
+                  ? Math.abs(steps[steps.length - 1].fc ?? steps[steps.length - 1].fxNext ?? steps[steps.length - 1].fxk ?? 0).toExponential(4)
                   : 'N/A')}
           </strong>
         </div>
@@ -152,24 +197,49 @@ export default function IterationTable({
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem', fontFamily: 'var(--font-mono)', textAlign: 'left' }}>
           <thead>
             <tr style={{ background: '#0e1422', position: 'sticky', top: 0, zIndex: 1, borderBottom: '1px solid var(--border-glass)' }}>
-              <th style={{ padding: '10px 14px', color: 'var(--text-muted)' }}>k</th>
-              {methodName.toLowerCase().includes('bisection') ? (
+              <th style={{ padding: '10px 14px', color: 'var(--text-muted)' }}>n</th>
+              
+              {isBisection && (
                 <>
-                  <th style={{ padding: '10px 14px', color: '#22d3ee' }}>aₖ</th>
-                  <th style={{ padding: '10px 14px', color: '#22d3ee' }}>bₖ</th>
-                  <th style={{ padding: '10px 14px', color: '#fbbf24' }}>cₖ (Midpoint)</th>
-                  <th style={{ padding: '10px 14px', color: 'var(--text-muted)' }}>f(aₖ)</th>
-                  <th style={{ padding: '10px 14px', color: 'var(--text-muted)' }}>f(bₖ)</th>
-                  <th style={{ padding: '10px 14px', color: '#fbbf24' }}>f(cₖ)</th>
-                </>
-              ) : (
-                <>
-                  <th style={{ padding: '10px 14px', color: '#818cf8' }}>xₖ</th>
-                  <th style={{ padding: '10px 14px', color: 'var(--text-muted)' }}>f(xₖ)</th>
-                  <th style={{ padding: '10px 14px', color: 'var(--text-muted)' }}>f'(xₖ)</th>
-                  <th style={{ padding: '10px 14px', color: '#34d399' }}>xₖ₊₁</th>
+                  <th style={{ padding: '10px 14px', color: '#22d3ee' }}>aₙ (Lower)</th>
+                  <th style={{ padding: '10px 14px', color: '#22d3ee' }}>bₙ (Upper)</th>
+                  <th style={{ padding: '10px 14px', color: '#fbbf24' }}>cₙ (Midpoint)</th>
+                  <th style={{ padding: '10px 14px', color: 'var(--text-muted)' }}>f(aₙ)</th>
+                  <th style={{ padding: '10px 14px', color: 'var(--text-muted)' }}>f(bₙ)</th>
+                  <th style={{ padding: '10px 14px', color: '#fbbf24' }}>f(cₙ)</th>
                 </>
               )}
+
+              {isRegulaFalsi && (
+                <>
+                  <th style={{ padding: '10px 14px', color: '#f59e0b' }}>aₙ</th>
+                  <th style={{ padding: '10px 14px', color: '#f59e0b' }}>bₙ</th>
+                  <th style={{ padding: '10px 14px', color: '#38bdf8' }}>cₙ (Chord Root)</th>
+                  <th style={{ padding: '10px 14px', color: 'var(--text-muted)' }}>f(aₙ)</th>
+                  <th style={{ padding: '10px 14px', color: 'var(--text-muted)' }}>f(bₙ)</th>
+                  <th style={{ padding: '10px 14px', color: '#38bdf8' }}>f(cₙ)</th>
+                </>
+              )}
+
+              {isNewton && (
+                <>
+                  <th style={{ padding: '10px 14px', color: '#818cf8' }}>xₙ (Current)</th>
+                  <th style={{ padding: '10px 14px', color: 'var(--text-muted)' }}>f(xₙ)</th>
+                  <th style={{ padding: '10px 14px', color: 'var(--text-muted)' }}>f'(xₙ)</th>
+                  <th style={{ padding: '10px 14px', color: '#34d399' }}>xₙ₊₁ (Next)</th>
+                </>
+              )}
+
+              {isSecant && (
+                <>
+                  <th style={{ padding: '10px 14px', color: '#10b981' }}>xₙ₋₁</th>
+                  <th style={{ padding: '10px 14px', color: '#10b981' }}>xₙ</th>
+                  <th style={{ padding: '10px 14px', color: 'var(--text-muted)' }}>f(xₙ₋₁)</th>
+                  <th style={{ padding: '10px 14px', color: 'var(--text-muted)' }}>f(xₙ)</th>
+                  <th style={{ padding: '10px 14px', color: '#34d399' }}>xₙ₊₁</th>
+                </>
+              )}
+
               <th style={{ padding: '10px 14px', color: 'var(--text-muted)' }}>Abs Error</th>
               <th style={{ padding: '10px 14px', color: 'var(--text-muted)' }}>Rel Error %</th>
             </tr>
@@ -194,7 +264,7 @@ export default function IterationTable({
                     {step.iteration}
                   </td>
 
-                  {methodName.toLowerCase().includes('bisection') ? (
+                  {isBisection && (
                     <>
                       <td style={{ padding: '8px 14px', color: 'var(--text-main)' }}>{step.a.toFixed(6)}</td>
                       <td style={{ padding: '8px 14px', color: 'var(--text-main)' }}>{step.b.toFixed(6)}</td>
@@ -203,7 +273,20 @@ export default function IterationTable({
                       <td style={{ padding: '8px 14px', color: 'var(--text-dim)' }}>{step.fb.toExponential(3)}</td>
                       <td style={{ padding: '8px 14px', color: '#fbbf24' }}>{step.fc.toExponential(3)}</td>
                     </>
-                  ) : (
+                  )}
+
+                  {isRegulaFalsi && (
+                    <>
+                      <td style={{ padding: '8px 14px', color: 'var(--text-main)' }}>{step.a.toFixed(6)}</td>
+                      <td style={{ padding: '8px 14px', color: 'var(--text-main)' }}>{step.b.toFixed(6)}</td>
+                      <td style={{ padding: '8px 14px', color: '#38bdf8', fontWeight: 600 }}>{step.c.toFixed(6)}</td>
+                      <td style={{ padding: '8px 14px', color: 'var(--text-dim)' }}>{step.fa.toExponential(3)}</td>
+                      <td style={{ padding: '8px 14px', color: 'var(--text-dim)' }}>{step.fb.toExponential(3)}</td>
+                      <td style={{ padding: '8px 14px', color: '#38bdf8' }}>{step.fc.toExponential(3)}</td>
+                    </>
+                  )}
+
+                  {isNewton && (
                     <>
                       <td style={{ padding: '8px 14px', color: 'var(--text-main)' }}>{step.xk.toFixed(6)}</td>
                       <td style={{ padding: '8px 14px', color: 'var(--text-dim)' }}>{step.fxk.toExponential(3)}</td>
@@ -212,8 +295,22 @@ export default function IterationTable({
                     </>
                   )}
 
+                  {isSecant && (
+                    <>
+                      <td style={{ padding: '8px 14px', color: 'var(--text-main)' }}>{step.xPrev.toFixed(6)}</td>
+                      <td style={{ padding: '8px 14px', color: 'var(--text-main)' }}>{step.xCurr.toFixed(6)}</td>
+                      <td style={{ padding: '8px 14px', color: 'var(--text-dim)' }}>{step.fPrev.toExponential(3)}</td>
+                      <td style={{ padding: '8px 14px', color: 'var(--text-dim)' }}>{step.fCurr.toExponential(3)}</td>
+                      <td style={{ padding: '8px 14px', color: '#34d399', fontWeight: 600 }}>{step.xNext.toFixed(6)}</td>
+                    </>
+                  )}
+
                   <td style={{ padding: '8px 14px', color: 'var(--text-dim)' }}>{step.error.toExponential(3)}</td>
-                  <td style={{ padding: '8px 14px', color: 'var(--text-dim)' }}>{step.relativeError.toFixed(3)}%</td>
+                  <td style={{ padding: '8px 14px', color: 'var(--text-dim)' }}>
+                    {step.relativeError !== null && step.relativeError !== undefined
+                      ? `${step.relativeError.toFixed(3)}%`
+                      : '—'}
+                  </td>
                 </tr>
               );
             })}

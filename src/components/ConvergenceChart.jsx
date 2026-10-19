@@ -1,11 +1,18 @@
 import React, { useRef, useEffect } from 'react';
 import { Scale } from 'lucide-react';
 
-export default function ConvergenceChart({ bisectionResult, newtonResult }) {
+export default function ConvergenceChart({
+  bisectionResult,
+  regulaFalsiResult,
+  newtonResult,
+  secantResult
+}) {
   const canvasRef = useRef(null);
 
   const bSteps = bisectionResult?.steps || [];
+  const rfSteps = regulaFalsiResult?.steps || [];
   const nSteps = newtonResult?.steps || [];
+  const sSteps = secantResult?.steps || [];
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -14,15 +21,20 @@ export default function ConvergenceChart({ bisectionResult, newtonResult }) {
     const width = canvas.width;
     const height = canvas.height;
 
+    const b = bisectionResult?.steps || [];
+    const rf = regulaFalsiResult?.steps || [];
+    const n = newtonResult?.steps || [];
+    const s = secantResult?.steps || [];
+
     // Clear
-    ctx.fillStyle = '#090d16';
+    ctx.fillStyle = '#080c15';
     ctx.fillRect(0, 0, width, height);
 
-    if (bSteps.length === 0 && nSteps.length === 0) {
+    if (b.length === 0 && rf.length === 0 && n.length === 0 && s.length === 0) {
       ctx.fillStyle = '#64748b';
       ctx.font = '13px Plus Jakarta Sans, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('Run comparison to view logarithmic error decay curves', width / 2, height / 2);
+      ctx.fillText('Run calculation to view logarithmic error decay curves', width / 2, height / 2);
       return;
     }
 
@@ -30,14 +42,12 @@ export default function ConvergenceChart({ bisectionResult, newtonResult }) {
     const chartW = width - padding.left - padding.right;
     const chartH = height - padding.top - padding.bottom;
 
-    // Determine max iterations and error ranges in log10 scale
-    const maxIter = Math.max(bSteps.length, nSteps.length, 5);
+    const maxIter = Math.max(b.length, rf.length, n.length, s.length, 5);
 
-    // Errors in log10: e.g. 10^-1 -> -1, 10^-12 -> -12
     const minLog = -14;
     const maxLog = 1;
 
-    const toX = (iter) => padding.left + ((iter - 1) / (maxIter - 1)) * chartW;
+    const toX = (iter) => padding.left + ((iter - 1) / Math.max(maxIter - 1, 1)) * chartW;
     const toY = (logVal) => padding.top + ((maxLog - logVal) / (maxLog - minLog)) * chartH;
 
     // Draw Grid Lines (log scale)
@@ -72,15 +82,17 @@ export default function ConvergenceChart({ bisectionResult, newtonResult }) {
     // Axis Labels
     ctx.fillStyle = '#94a3b8';
     ctx.font = '11px Plus Jakarta Sans, sans-serif';
-    ctx.fillText('Iterations (k)', padding.left + chartW / 2, height - 10);
+    ctx.fillText('Iterations (n)', padding.left + chartW / 2, height - 10);
 
-    // Draw Bisection Line (Cyan)
-    if (bSteps.length > 0) {
-      ctx.strokeStyle = '#06b6d4';
+    // Helper to draw series
+    const drawSeries = (steps, strokeColor, fillColor) => {
+      if (!steps || steps.length === 0) return;
+
+      ctx.strokeStyle = strokeColor;
       ctx.lineWidth = 2.5;
       ctx.beginPath();
 
-      bSteps.forEach((s, idx) => {
+      steps.forEach((s, idx) => {
         const logErr = Math.max(minLog, Math.log10(Math.max(s.error, 1e-15)));
         const px = toX(s.iteration);
         const py = toY(logErr);
@@ -89,45 +101,28 @@ export default function ConvergenceChart({ bisectionResult, newtonResult }) {
       });
       ctx.stroke();
 
-      // Points
-      ctx.fillStyle = '#22d3ee';
-      bSteps.forEach((s) => {
+      ctx.fillStyle = fillColor;
+      steps.forEach((s) => {
         const logErr = Math.max(minLog, Math.log10(Math.max(s.error, 1e-15)));
         ctx.beginPath();
         ctx.arc(toX(s.iteration), toY(logErr), 3.5, 0, Math.PI * 2);
         ctx.fill();
       });
-    }
+    };
 
-    // Draw Newton-Raphson Line (Indigo/Violet)
-    if (nSteps.length > 0) {
-      ctx.strokeStyle = '#818cf8';
-      ctx.lineWidth = 2.5;
-      ctx.beginPath();
+    // 1. Bisection (Cyan)
+    drawSeries(b, '#06b6d4', '#22d3ee');
 
-      nSteps.forEach((s, idx) => {
-        const logErr = Math.max(minLog, Math.log10(Math.max(s.error, 1e-15)));
-        const px = toX(s.iteration);
-        const py = toY(logErr);
-        if (idx === 0) ctx.moveTo(px, py);
-        else ctx.lineTo(px, py);
-      });
-      ctx.stroke();
+    // 2. Regula Falsi (Amber)
+    drawSeries(rf, '#f59e0b', '#fbbf24');
 
-      // Points
-      ctx.fillStyle = '#a5b4fc';
-      nSteps.forEach((s) => {
-        const logErr = Math.max(minLog, Math.log10(Math.max(s.error, 1e-15)));
-        ctx.beginPath();
-        ctx.arc(toX(s.iteration), toY(logErr), 3.5, 0, Math.PI * 2);
-        ctx.fill();
-      });
-    }
+    // 3. Newton-Raphson (Indigo)
+    drawSeries(n, '#818cf8', '#a5b4fc');
 
-  }, [bisectionResult, newtonResult]);
+    // 4. Secant (Emerald)
+    drawSeries(s, '#10b981', '#34d399');
 
-  const bIter = bSteps.length;
-  const nIter = nSteps.length;
+  }, [bisectionResult, regulaFalsiResult, newtonResult, secantResult]);
 
   return (
     <div className="glass-panel" style={{ padding: '20px', marginBottom: '24px' }}>
@@ -137,20 +132,36 @@ export default function ConvergenceChart({ bisectionResult, newtonResult }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <Scale size={18} color="#10b981" />
           <h3 style={{ fontSize: '1.05rem', fontWeight: 700 }}>
-            Error Convergence Rate Analysis
+            Error Convergence Rate Analysis (Logarithmic Error Decay)
           </h3>
         </div>
 
         {/* Legend */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '0.82rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ width: '12px', height: '3px', background: '#06b6d4', borderRadius: '2px' }} />
-            <span style={{ color: '#22d3ee' }}>Bisection (Linear: O(1/2ᵏ))</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ width: '12px', height: '3px', background: '#818cf8', borderRadius: '2px' }} />
-            <span style={{ color: '#818cf8' }}>Newton-Raphson (Quadratic: O(e²))</span>
-          </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap', fontSize: '0.8rem' }}>
+          {bSteps.length > 0 && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ width: '12px', height: '3px', background: '#06b6d4', borderRadius: '2px' }} />
+              <span style={{ color: '#22d3ee' }}>Bisection (p=1)</span>
+            </div>
+          )}
+          {rfSteps.length > 0 && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ width: '12px', height: '3px', background: '#f59e0b', borderRadius: '2px' }} />
+              <span style={{ color: '#fbbf24' }}>Regula Falsi (p=1)</span>
+            </div>
+          )}
+          {nSteps.length > 0 && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ width: '12px', height: '3px', background: '#818cf8', borderRadius: '2px' }} />
+              <span style={{ color: '#818cf8' }}>Newton–Raphson (p=2)</span>
+            </div>
+          )}
+          {sSteps.length > 0 && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ width: '12px', height: '3px', background: '#10b981', borderRadius: '2px' }} />
+              <span style={{ color: '#34d399' }}>Secant (p≈1.62)</span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -165,47 +176,67 @@ export default function ConvergenceChart({ bisectionResult, newtonResult }) {
       </div>
 
       {/* Comparative Analysis Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '14px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '14px' }}>
         
         {/* Bisection Card */}
-        <div style={{
-          padding: '14px 18px',
-          background: 'rgba(6, 182, 212, 0.05)',
-          border: '1px solid rgba(6, 182, 212, 0.2)',
-          borderRadius: '12px'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <strong style={{ color: '#22d3ee', fontSize: '0.92rem' }}>Bisection Method</strong>
-            <span className="badge badge-cyan">Guaranteed Linear (p = 1)</span>
+        {bSteps.length > 0 && (
+          <div style={{ padding: '14px 16px', background: 'rgba(6, 182, 212, 0.05)', border: '1px solid rgba(6, 182, 212, 0.2)', borderRadius: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+              <strong style={{ color: '#22d3ee', fontSize: '0.9rem' }}>Bisection Method</strong>
+              <span className="badge badge-cyan">Linear (p = 1)</span>
+            </div>
+            <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
+              • Unconditional convergence if <code className="math-mono">f(a)·f(b) &lt; 0</code>.<br />
+              • Midpoint: <code className="math-mono">c = (a + b) / 2</code>.<br />
+              • Took <strong>{bSteps.length} iterations</strong>.
+            </p>
           </div>
-          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
-            • Guaranteed convergence when bracketing conditions hold (<code className="math-mono">f(a)·f(b) &lt; 0</code>).
-            <br />
-            • Error interval strictly halves each step: <code className="math-mono">|bₖ - aₖ| = |b₀ - a₀| / 2ᵏ</code>.
-            <br />
-            • Actual iterations: <strong>{bIter || '–'} steps</strong> to reach tolerance.
-          </p>
-        </div>
+        )}
+
+        {/* Regula Falsi Card */}
+        {rfSteps.length > 0 && (
+          <div style={{ padding: '14px 16px', background: 'rgba(245, 158, 11, 0.05)', border: '1px solid rgba(245, 158, 11, 0.2)', borderRadius: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+              <strong style={{ color: '#fbbf24', fontSize: '0.9rem' }}>Regula Falsi</strong>
+              <span className="badge badge-amber">Linear (Chord)</span>
+            </div>
+            <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
+              • Retains bracketing safety while using chord slope.<br />
+              • Formula: <code className="math-mono">c = (a·fb - b·fa)/(fb - fa)</code>.<br />
+              • Took <strong>{rfSteps.length} iterations</strong>.
+            </p>
+          </div>
+        )}
 
         {/* Newton Card */}
-        <div style={{
-          padding: '14px 18px',
-          background: 'rgba(99, 102, 241, 0.05)',
-          border: '1px solid rgba(99, 102, 241, 0.2)',
-          borderRadius: '12px'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <strong style={{ color: '#818cf8', fontSize: '0.92rem' }}>Newton–Raphson Method</strong>
-            <span className="badge badge-indigo">Local Quadratic (p = 2)</span>
+        {nSteps.length > 0 && (
+          <div style={{ padding: '14px 16px', background: 'rgba(99, 102, 241, 0.05)', border: '1px solid rgba(99, 102, 241, 0.2)', borderRadius: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+              <strong style={{ color: '#818cf8', fontSize: '0.9rem' }}>Newton–Raphson</strong>
+              <span className="badge badge-indigo">Quadratic (p = 2)</span>
+            </div>
+            <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
+              • Rapid quadratic convergence using exact derivative <code className="math-mono">f'(x)</code>.<br />
+              • Formula: <code className="math-mono">xₙ₊₁ = xₙ - f(xₙ)/f'(xₙ)</code>.<br />
+              • Took <strong>{nSteps.length} iterations</strong>.
+            </p>
           </div>
-          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
-            • Local quadratic convergence near a simple root under suitable conditions: <code className="math-mono">|eₙ₊₁| ≈ C·|eₙ|²</code>.
-            <br />
-            • Convergence rate depends on the chosen initial guess <code className="math-mono">x₀</code> and function behavior.
-            <br />
-            • Actual iterations: <strong>{nIter || '–'} steps</strong> {bIter > 0 && nIter > 0 ? `(${bIter > nIter ? `${(bIter / nIter).toFixed(1)}x fewer iterations than Bisection` : 'for current initial guess'})` : ''}.
-          </p>
-        </div>
+        )}
+
+        {/* Secant Card */}
+        {sSteps.length > 0 && (
+          <div style={{ padding: '14px 16px', background: 'rgba(16, 185, 129, 0.05)', border: '1px solid rgba(16, 185, 129, 0.2)', borderRadius: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+              <strong style={{ color: '#34d399', fontSize: '0.9rem' }}>Secant Method</strong>
+              <span className="badge badge-emerald">Superlinear (p ≈ 1.62)</span>
+            </div>
+            <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
+              • Approximates derivative without symbolic differentiation.<br />
+              • Formula: <code className="math-mono">xₙ₊₁ = xₙ - f(xₙ)·(xₙ - xₙ₋₁)/(f(xₙ) - f(xₙ₋₁))</code>.<br />
+              • Took <strong>{sSteps.length} iterations</strong>.
+            </p>
+          </div>
+        )}
 
       </div>
 
