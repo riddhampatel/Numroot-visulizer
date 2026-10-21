@@ -111,238 +111,166 @@ export default function Controls({
   };
 
   return (
-    <div className="glass-panel" style={{ padding: '20px 24px', marginBottom: '24px' }}>
+    <div className="glass-panel p-5 sm:p-6 mb-6">
       
       {/* Top Presets Row */}
-      <div style={{ marginBottom: '18px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-          <span style={{ fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-dim)', fontWeight: 700 }}>
-            Quick Textbook & Exam Presets
+      <div className="mb-5">
+        <div className="flex items-center justify-between mb-2.5">
+          <span className="text-[11px] uppercase tracking-wider text-slate-400 font-bold">
+            Quick Textbook &amp; Exam Presets
           </span>
-          <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>
+          <span className="text-xs text-slate-500 hidden sm:inline">
             Click to load instant test cases
           </span>
         </div>
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          {PRESETS.map((p) => (
-            <button
-              key={p.name}
-              type="button"
-              onClick={() => handleApplyPreset(p)}
-              className="btn-secondary"
-              style={{
-                fontSize: '0.78rem',
-                padding: '6px 12px',
-                borderRadius: '8px',
-                background: equation === p.expr ? 'rgba(99, 102, 241, 0.2)' : 'rgba(255, 255, 255, 0.04)',
-                borderColor: equation === p.expr ? 'var(--accent-indigo)' : 'var(--border-glass)'
-              }}
-            >
-              <Zap size={12} color={equation === p.expr ? '#818cf8' : '#94a3b8'} />
-              <span>{p.desc}</span>
-            </button>
-          ))}
+        <div className="flex flex-wrap gap-2">
+          {PRESETS.map((p) => {
+            const isSelected = equation === p.expr;
+            return (
+              <button
+                key={p.name}
+                type="button"
+                onClick={() => handleApplyPreset(p)}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all duration-200 cursor-pointer ${
+                  isSelected
+                    ? 'bg-indigo-500/20 border-indigo-500 text-indigo-300 shadow-sm shadow-indigo-500/20'
+                    : 'bg-white/4 border-white/10 text-slate-300 hover:bg-white/8 hover:border-white/20'
+                }`}
+              >
+                <Zap size={13} className={isSelected ? 'text-indigo-400' : 'text-slate-400'} />
+                <span>{p.desc}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* Method Selector Tabs */}
-      <div style={{ marginBottom: '18px' }}>
-        <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '8px' }}>
+      <div className="mb-5">
+        <label className="block text-xs font-semibold text-slate-300 mb-2.5">
           Select Numerical Method
         </label>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '8px' }}>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
           
           {/* 1. Bisection */}
           <button
             type="button"
             onClick={() => handleSelectMethod('bisection')}
-            style={{
-              padding: '10px 12px',
-              borderRadius: '10px',
-              border: method === 'bisection' ? '1px solid #06b6d4' : '1px solid var(--border-glass)',
-              background: method === 'bisection' ? 'rgba(6, 182, 212, 0.12)' : 'rgba(255, 255, 255, 0.03)',
-              color: method === 'bisection' ? '#22d3ee' : 'var(--text-muted)',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              fontWeight: 600,
-              fontSize: '0.84rem',
-              transition: 'all 0.2s ease'
-            }}
+            className={`px-3 py-2.5 rounded-xl border flex items-center gap-2 text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer ${
+              method === 'bisection'
+                ? 'border-cyan-400 bg-cyan-500/15 text-cyan-300 shadow-md shadow-cyan-500/20'
+                : 'border-white/10 bg-white/3 text-slate-400 hover:bg-white/6 hover:text-slate-200'
+            }`}
           >
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: method === 'bisection' ? '#06b6d4' : '#64748b' }} />
-            Bisection (p=1)
+            <span className={`w-2 h-2 rounded-full shrink-0 ${method === 'bisection' ? 'bg-cyan-400 ring-2 ring-cyan-400/30' : 'bg-slate-600'}`} />
+            <span className="truncate">Bisection (p=1)</span>
           </button>
 
           {/* 2. Regula Falsi */}
           <button
             type="button"
             onClick={() => handleSelectMethod('regula_falsi')}
-            style={{
-              padding: '10px 12px',
-              borderRadius: '10px',
-              border: method === 'regula_falsi' ? '1px solid #f59e0b' : '1px solid var(--border-glass)',
-              background: method === 'regula_falsi' ? 'rgba(245, 158, 11, 0.12)' : 'rgba(255, 255, 255, 0.03)',
-              color: method === 'regula_falsi' ? '#fbbf24' : 'var(--text-muted)',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              fontWeight: 600,
-              fontSize: '0.84rem',
-              transition: 'all 0.2s ease'
-            }}
+            className={`px-3 py-2.5 rounded-xl border flex items-center gap-2 text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer ${
+              method === 'regula_falsi'
+                ? 'border-amber-400 bg-amber-500/15 text-amber-300 shadow-md shadow-amber-500/20'
+                : 'border-white/10 bg-white/3 text-slate-400 hover:bg-white/6 hover:text-slate-200'
+            }`}
           >
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: method === 'regula_falsi' ? '#f59e0b' : '#64748b' }} />
-            Regula Falsi (Chord)
+            <span className={`w-2 h-2 rounded-full shrink-0 ${method === 'regula_falsi' ? 'bg-amber-400 ring-2 ring-amber-400/30' : 'bg-slate-600'}`} />
+            <span className="truncate">Regula Falsi (Chord)</span>
           </button>
 
           {/* 3. Newton-Raphson */}
           <button
             type="button"
             onClick={() => handleSelectMethod('newton')}
-            style={{
-              padding: '10px 12px',
-              borderRadius: '10px',
-              border: method === 'newton' ? '1px solid #818cf8' : '1px solid var(--border-glass)',
-              background: method === 'newton' ? 'rgba(99, 102, 241, 0.12)' : 'rgba(255, 255, 255, 0.03)',
-              color: method === 'newton' ? '#818cf8' : 'var(--text-muted)',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              fontWeight: 600,
-              fontSize: '0.84rem',
-              transition: 'all 0.2s ease'
-            }}
+            className={`px-3 py-2.5 rounded-xl border flex items-center gap-2 text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer ${
+              method === 'newton'
+                ? 'border-indigo-400 bg-indigo-500/15 text-indigo-300 shadow-md shadow-indigo-500/20'
+                : 'border-white/10 bg-white/3 text-slate-400 hover:bg-white/6 hover:text-slate-200'
+            }`}
           >
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: method === 'newton' ? '#818cf8' : '#64748b' }} />
-            Newton–Raphson (p=2)
+            <span className={`w-2 h-2 rounded-full shrink-0 ${method === 'newton' ? 'bg-indigo-400 ring-2 ring-indigo-400/30' : 'bg-slate-600'}`} />
+            <span className="truncate">Newton–Raphson (p=2)</span>
           </button>
 
           {/* 4. Secant Method */}
           <button
             type="button"
             onClick={() => handleSelectMethod('secant')}
-            style={{
-              padding: '10px 12px',
-              borderRadius: '10px',
-              border: method === 'secant' ? '1px solid #10b981' : '1px solid var(--border-glass)',
-              background: method === 'secant' ? 'rgba(16, 185, 129, 0.12)' : 'rgba(255, 255, 255, 0.03)',
-              color: method === 'secant' ? '#34d399' : 'var(--text-muted)',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              fontWeight: 600,
-              fontSize: '0.84rem',
-              transition: 'all 0.2s ease'
-            }}
+            className={`px-3 py-2.5 rounded-xl border flex items-center gap-2 text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer ${
+              method === 'secant'
+                ? 'border-emerald-400 bg-emerald-500/15 text-emerald-300 shadow-md shadow-emerald-500/20'
+                : 'border-white/10 bg-white/3 text-slate-400 hover:bg-white/6 hover:text-slate-200'
+            }`}
           >
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: method === 'secant' ? '#10b981' : '#64748b' }} />
-            Secant Method (p≈1.62)
+            <span className={`w-2 h-2 rounded-full shrink-0 ${method === 'secant' ? 'bg-emerald-400 ring-2 ring-emerald-400/30' : 'bg-slate-600'}`} />
+            <span className="truncate">Secant (p≈1.62)</span>
           </button>
 
           {/* 5. Compare All */}
           <button
             type="button"
             onClick={() => handleSelectMethod('compare')}
-            style={{
-              padding: '10px 12px',
-              borderRadius: '10px',
-              border: method === 'compare' ? '1px solid #e2e8f0' : '1px solid var(--border-glass)',
-              background: method === 'compare' ? 'rgba(255, 255, 255, 0.12)' : 'rgba(255, 255, 255, 0.03)',
-              color: method === 'compare' ? '#ffffff' : 'var(--text-muted)',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              fontWeight: 600,
-              fontSize: '0.84rem',
-              transition: 'all 0.2s ease'
-            }}
+            className={`px-3 py-2.5 rounded-xl border flex items-center gap-2 text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer col-span-2 sm:col-span-1 ${
+              method === 'compare'
+                ? 'border-white/40 bg-white/15 text-white shadow-md shadow-white/10'
+                : 'border-white/10 bg-white/3 text-slate-400 hover:bg-white/6 hover:text-slate-200'
+            }`}
           >
-            <ArrowRightLeft size={14} color={method === 'compare' ? '#ffffff' : '#64748b'} />
-            Compare All 4 Methods
+            <ArrowRightLeft size={15} className={method === 'compare' ? 'text-white' : 'text-slate-500'} />
+            <span className="truncate">Compare All 4</span>
           </button>
 
         </div>
       </div>
 
-      {/* Input Parameters Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', alignItems: 'flex-end' }}>
-        
-        {/* Equation Input */}
-        <div style={{ gridColumn: 'span 2', minWidth: '280px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-            <label style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-muted)' }}>
-              Mathematical Function: <span style={{ color: '#38bdf8', fontFamily: 'var(--font-mono)' }}>f(x) = 0</span>
-            </label>
-            {liveDeriv && (
-              <span style={{ fontSize: '0.74rem', color: '#a5b4fc', fontFamily: 'var(--font-mono)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <FunctionSquare size={12} color="#818cf8" /> f'(x) = {liveDeriv}
-              </span>
-            )}
-          </div>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            background: 'rgba(15, 21, 34, 0.9)',
-            border: '1px solid var(--border-glass)',
-            borderRadius: '10px',
-            overflow: 'hidden',
-            boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.3)'
-          }}>
-            <span style={{
-              padding: '10px 14px',
-              background: 'rgba(99, 102, 241, 0.1)',
-              borderRight: '1px solid var(--border-glass)',
-              color: '#818cf8',
-              fontFamily: 'var(--font-mono)',
-              fontSize: '0.88rem',
-              fontWeight: 600,
-              userSelect: 'none',
-              whiteSpace: 'nowrap'
-            }}>
-              f(x) =
+      {/* Row 1: Dedicated Full-Width Function Equation Input */}
+      <div className="mb-4">
+        <div className="flex items-center justify-between mb-1.5">
+          <label className="text-xs font-semibold text-slate-300">
+            Mathematical Function: <span className="text-cyan-400 font-mono font-bold">f(x) = 0</span>
+          </label>
+          {liveDeriv && (
+            <span className="text-[11px] text-indigo-300 font-mono flex items-center gap-1.5 bg-indigo-950/70 px-2.5 py-1 rounded-md border border-indigo-500/30 shadow-sm">
+              <FunctionSquare size={13} className="text-indigo-400" />
+              <span>f'(x) = {liveDeriv}</span>
             </span>
-            <input
-              type="text"
-              id="input-equation"
-              value={equation}
-              onChange={(e) => setEquation(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="e.g. x^3 - x - 2 or cos(x) - x"
-              style={{
-                flex: 1,
-                background: 'transparent',
-                border: 'none',
-                outline: 'none',
-                padding: '10px 14px',
-                color: 'var(--text-main)',
-                fontSize: '0.92rem',
-                fontFamily: 'var(--font-mono)',
-                width: '100%'
-              }}
-            />
-          </div>
+          )}
         </div>
+        <div className="flex items-center bg-slate-900/90 border border-white/10 rounded-xl overflow-hidden focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/25 transition-all">
+          <span className="px-4 py-2.5 bg-indigo-500/10 border-r border-white/10 text-indigo-300 font-mono text-sm font-semibold select-none whitespace-nowrap">
+            f(x) =
+          </span>
+          <input
+            type="text"
+            id="input-equation"
+            value={equation}
+            onChange={(e) => setEquation(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="e.g. x^3 - x - 2 or cos(x) - x"
+            className="flex-1 bg-transparent border-none outline-none px-3.5 py-2.5 text-slate-100 text-sm font-mono placeholder:text-slate-500 w-full"
+          />
+        </div>
+      </div>
 
-        {/* Bracket Bounds [a, b] for Bisection, Regula Falsi, or Compare */}
+      {/* Row 2: Parameters & Action Buttons (Balanced Grid: Exactly Fills Width with Zero Empty Space) */}
+      <div className={`grid grid-cols-1 sm:grid-cols-2 ${method === 'compare' ? 'lg:grid-cols-5' : 'lg:grid-cols-4'} gap-3.5 items-end`}>
+        
+        {/* Method-Specific Input: Bracket [a, b] for Bisection / Regula Falsi / Compare */}
         {(method === 'bisection' || method === 'regula_falsi' || method === 'compare') && (
           <div>
-            <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: method === 'regula_falsi' ? '#fbbf24' : '#22d3ee', marginBottom: '6px' }}>
-              Bracket Interval [a, b] (Sign Change)
+            <label className={`block text-xs font-semibold mb-1.5 ${method === 'regula_falsi' ? 'text-amber-400' : 'text-cyan-400'}`}>
+              Bracket [a, b] (Sign Change)
             </label>
-            <div style={{ display: 'flex', gap: '8px' }}>
+            <div className="grid grid-cols-2 gap-2">
               <input
                 type="number"
                 step="any"
                 value={a}
                 onChange={(e) => setA(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="a (lower)"
+                placeholder="a"
                 className="input-field"
                 title="Lower bound a"
               />
@@ -352,7 +280,7 @@ export default function Controls({
                 value={b}
                 onChange={(e) => setB(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="b (upper)"
+                placeholder="b"
                 className="input-field"
                 title="Upper bound b"
               />
@@ -360,10 +288,10 @@ export default function Controls({
           </div>
         )}
 
-        {/* Newton Initial Guess x₀ */}
+        {/* Method-Specific Input: Newton Initial Guess x₀ */}
         {(method === 'newton' || method === 'compare') && (
           <div>
-            <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#818cf8', marginBottom: '6px' }}>
+            <label className="block text-xs font-semibold text-indigo-400 mb-1.5">
               Newton Initial Guess x₀
             </label>
             <input
@@ -374,24 +302,25 @@ export default function Controls({
               onKeyDown={handleKeyDown}
               placeholder="e.g. 1.5"
               className="input-field"
+              title="Initial guess x₀"
             />
           </div>
         )}
 
-        {/* Secant Initial Guesses x₀ & x₁ */}
+        {/* Method-Specific Input: Secant Guesses [x₀, x₁] */}
         {method === 'secant' && (
           <div>
-            <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#34d399', marginBottom: '6px' }}>
-              Secant Initial Guesses [x₀, x₁]
+            <label className="block text-xs font-semibold text-emerald-400 mb-1.5">
+              Secant Guesses [x₀, x₁]
             </label>
-            <div style={{ display: 'flex', gap: '8px' }}>
+            <div className="grid grid-cols-2 gap-2">
               <input
                 type="number"
                 step="any"
                 value={x0}
                 onChange={(e) => setX0(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="x₀ (first guess)"
+                placeholder="x₀"
                 className="input-field"
                 title="Initial guess x₀"
               />
@@ -401,7 +330,7 @@ export default function Controls({
                 value={x1}
                 onChange={(e) => setX1(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="x₁ (second guess)"
+                placeholder="x₁"
                 className="input-field"
                 title="Initial guess x₁"
               />
@@ -409,9 +338,9 @@ export default function Controls({
           </div>
         )}
 
-        {/* Tolerance */}
+        {/* Tolerance (ε) */}
         <div>
-          <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '6px' }}>
+          <label className="block text-xs font-semibold text-slate-300 mb-1.5">
             Tolerance (ε)
           </label>
           <input
@@ -422,12 +351,13 @@ export default function Controls({
             onKeyDown={handleKeyDown}
             placeholder="0.00001"
             className="input-field"
+            title="Tolerance stopping threshold"
           />
         </div>
 
         {/* Max Iterations */}
         <div>
-          <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '6px' }}>
+          <label className="block text-xs font-semibold text-slate-300 mb-1.5">
             Max Iterations
           </label>
           <input
@@ -437,29 +367,28 @@ export default function Controls({
             onKeyDown={handleKeyDown}
             placeholder="25"
             className="input-field"
+            title="Maximum allowed iterations"
           />
         </div>
 
-        {/* Action Buttons */}
-        <div style={{ display: 'flex', gap: '8px' }}>
+        {/* Action Buttons (Fills the remaining slot cleanly with 0 empty space) */}
+        <div className={`flex gap-2 ${method === 'compare' ? 'sm:col-span-2 lg:col-span-1' : ''}`}>
           <button
             type="button"
             onClick={onCalculate}
-            className="btn-primary"
-            style={{ flex: 1, padding: '10px 18px' }}
+            className="flex-1 bg-gradient-to-r from-indigo-600 via-sky-600 to-cyan-500 hover:from-indigo-500 hover:via-sky-500 hover:to-cyan-400 text-white font-semibold text-xs sm:text-sm rounded-xl px-3.5 py-2.5 flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/25 hover:shadow-cyan-500/30 transition-all duration-200 active:scale-95 cursor-pointer h-[42px]"
           >
-            <Play size={16} />
-            Compute Root
+            <Play size={15} className="fill-white" />
+            <span className="truncate">Compute Root</span>
           </button>
 
           <button
             type="button"
             onClick={onReset}
-            className="btn-secondary"
+            className="bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-slate-300 hover:text-white rounded-xl px-3 py-2.5 flex items-center justify-center transition-all duration-200 active:scale-95 cursor-pointer h-[42px] shrink-0"
             title="Reset to defaults"
-            style={{ padding: '10px 14px' }}
           >
-            <RotateCcw size={16} />
+            <RotateCcw size={15} />
           </button>
         </div>
 

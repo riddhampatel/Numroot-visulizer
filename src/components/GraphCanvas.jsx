@@ -448,162 +448,141 @@ export default function GraphCanvas({
   };
 
   return (
-    <div className="glass-panel" style={{ padding: '20px', marginBottom: '24px' }}>
+    <div className="glass-panel p-4 sm:p-5 md:p-6 mb-6">
       
       {/* Canvas Top Bar */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', flexWrap: 'wrap', gap: '12px' }}>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
         
         {/* Visual Method View Switcher */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-          <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-main)' }}>
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-xs sm:text-sm font-bold text-slate-200">
             Geometric Visualizer:
           </span>
           {method === 'compare' ? (
-            <div style={{ display: 'flex', gap: '6px' }}>
+            <div className="flex flex-wrap gap-1.5">
               {[
-                { id: 'bisection', label: 'Bisection', color: '#06b6d4' },
-                { id: 'regula_falsi', label: 'Regula Falsi', color: '#f59e0b' },
-                { id: 'newton', label: 'Newton-Raphson', color: '#818cf8' },
-                { id: 'secant', label: 'Secant', color: '#10b981' }
-              ].map((m) => (
-                <button
-                  key={m.id}
-                  onClick={() => {
-                    setCompareVisualMethod(m.id);
-                    setCurrentStepIndex(0);
-                  }}
-                  style={{
-                    padding: '4px 10px',
-                    borderRadius: '6px',
-                    border: activeVisualMethod === m.id ? `1px solid ${m.color}` : '1px solid var(--border-glass)',
-                    background: activeVisualMethod === m.id ? 'rgba(255,255,255,0.1)' : 'transparent',
-                    color: activeVisualMethod === m.id ? m.color : 'var(--text-dim)',
-                    fontSize: '0.76rem',
-                    fontWeight: 600,
-                    cursor: 'pointer'
-                  }}
-                >
-                  {m.label}
-                </button>
-              ))}
+                { id: 'bisection', label: 'Bisection', activeCls: 'border-cyan-400 bg-cyan-500/15 text-cyan-300' },
+                { id: 'regula_falsi', label: 'Regula Falsi', activeCls: 'border-amber-400 bg-amber-500/15 text-amber-300' },
+                { id: 'newton', label: 'Newton-Raphson', activeCls: 'border-indigo-400 bg-indigo-500/15 text-indigo-300' },
+                { id: 'secant', label: 'Secant', activeCls: 'border-emerald-400 bg-emerald-500/15 text-emerald-300' }
+              ].map((m) => {
+                const isActive = activeVisualMethod === m.id;
+                return (
+                  <button
+                    key={m.id}
+                    onClick={() => {
+                      setCompareVisualMethod(m.id);
+                      setCurrentStepIndex(0);
+                    }}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
+                      isActive
+                        ? m.activeCls
+                        : 'border-white/10 bg-transparent text-slate-400 hover:text-slate-200 hover:bg-white/5'
+                    }`}
+                  >
+                    {m.label}
+                  </button>
+                );
+              })}
             </div>
           ) : (
-            <span style={{
-              fontSize: '0.78rem',
-              fontWeight: 600,
-              padding: '3px 8px',
-              borderRadius: '6px',
-              background: 'rgba(255,255,255,0.06)',
-              color: '#38bdf8'
-            }}>
+            <span className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-white/5 text-cyan-300 border border-cyan-500/30">
               {activeVisualMethod.replace('_', ' ').toUpperCase()} MODE
             </span>
           )}
         </div>
 
         {/* Playback & Zoom Controls */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <button
-            onClick={() => setCurrentStepIndex(0)}
-            disabled={totalSteps <= 1}
-            className="btn-secondary"
-            style={{ padding: '6px 10px', fontSize: '0.75rem' }}
-            title="First Step"
-          >
-            <SkipBack size={14} />
-          </button>
-          
-          <button
-            onClick={() => setCurrentStepIndex((p) => Math.max(0, p - 1))}
-            disabled={currentStepIndex <= 0}
-            className="btn-secondary"
-            style={{ padding: '6px 10px', fontSize: '0.75rem' }}
-            title="Previous Step"
-          >
-            -1
-          </button>
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <div className="flex items-center gap-1 bg-slate-900/80 p-1 rounded-xl border border-white/10">
+            <button
+              onClick={() => setCurrentStepIndex(0)}
+              disabled={totalSteps <= 1}
+              className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 disabled:opacity-40 disabled:hover:bg-transparent transition-all cursor-pointer disabled:cursor-not-allowed"
+              title="First Step"
+            >
+              <SkipBack size={14} />
+            </button>
+            
+            <button
+              onClick={() => setCurrentStepIndex((p) => Math.max(0, p - 1))}
+              disabled={currentStepIndex <= 0}
+              className="px-2 py-1 rounded-lg text-xs font-mono font-medium text-slate-300 hover:text-white hover:bg-white/10 disabled:opacity-40 disabled:hover:bg-transparent transition-all cursor-pointer disabled:cursor-not-allowed"
+              title="Previous Step"
+            >
+              -1
+            </button>
 
-          <button
-            onClick={() => setIsPlaying(!isPlaying)}
-            disabled={totalSteps <= 1}
-            className="btn-primary"
-            style={{ padding: '6px 12px', fontSize: '0.75rem' }}
-            title={isPlaying ? 'Pause' : 'Play Step-by-Step'}
-          >
-            {isPlaying ? <Pause size={14} /> : <Play size={14} />}
-            <span>{isPlaying ? 'Pause' : 'Play'}</span>
-          </button>
+            <button
+              onClick={() => setIsPlaying(!isPlaying)}
+              disabled={totalSteps <= 1}
+              className="inline-flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-semibold bg-gradient-to-r from-indigo-500 to-cyan-500 hover:from-indigo-400 hover:to-cyan-400 text-white shadow-sm transition-all disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed"
+              title={isPlaying ? 'Pause' : 'Play Step-by-Step'}
+            >
+              {isPlaying ? <Pause size={14} /> : <Play size={14} className="fill-white" />}
+              <span>{isPlaying ? 'Pause' : 'Play'}</span>
+            </button>
 
-          <button
-            onClick={() => setCurrentStepIndex((p) => Math.min(totalSteps - 1, p + 1))}
-            disabled={currentStepIndex >= totalSteps - 1}
-            className="btn-secondary"
-            style={{ padding: '6px 10px', fontSize: '0.75rem' }}
-            title="Next Step"
-          >
-            +1
-          </button>
+            <button
+              onClick={() => setCurrentStepIndex((p) => Math.min(totalSteps - 1, p + 1))}
+              disabled={currentStepIndex >= totalSteps - 1}
+              className="px-2 py-1 rounded-lg text-xs font-mono font-medium text-slate-300 hover:text-white hover:bg-white/10 disabled:opacity-40 disabled:hover:bg-transparent transition-all cursor-pointer disabled:cursor-not-allowed"
+              title="Next Step"
+            >
+              +1
+            </button>
 
-          <button
-            onClick={() => setCurrentStepIndex(totalSteps - 1)}
-            disabled={totalSteps <= 1}
-            className="btn-secondary"
-            style={{ padding: '6px 10px', fontSize: '0.75rem' }}
-            title="Final Step"
-          >
-            <SkipForward size={14} />
-          </button>
+            <button
+              onClick={() => setCurrentStepIndex(totalSteps - 1)}
+              disabled={totalSteps <= 1}
+              className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 disabled:opacity-40 disabled:hover:bg-transparent transition-all cursor-pointer disabled:cursor-not-allowed"
+              title="Final Step"
+            >
+              <SkipForward size={14} />
+            </button>
+          </div>
 
-          <div style={{ width: '1px', height: '18px', background: 'var(--border-glass)', margin: '0 4px' }} />
+          <div className="flex items-center gap-1 bg-slate-900/80 p-1 rounded-xl border border-white/10">
+            <button
+              onClick={() => handleZoom(0.8)}
+              className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-all cursor-pointer"
+              title="Zoom In"
+            >
+              <ZoomIn size={14} />
+            </button>
 
-          <button
-            onClick={() => handleZoom(0.8)}
-            className="btn-secondary"
-            style={{ padding: '6px 10px' }}
-            title="Zoom In"
-          >
-            <ZoomIn size={14} />
-          </button>
+            <button
+              onClick={() => handleZoom(1.25)}
+              className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-all cursor-pointer"
+              title="Zoom Out"
+            >
+              <ZoomOut size={14} />
+            </button>
 
-          <button
-            onClick={() => handleZoom(1.25)}
-            className="btn-secondary"
-            style={{ padding: '6px 10px' }}
-            title="Zoom Out"
-          >
-            <ZoomOut size={14} />
-          </button>
-
-          <button
-            onClick={handleResetZoom}
-            className="btn-secondary"
-            style={{ padding: '6px 10px' }}
-            title="Reset View Window"
-          >
-            <RefreshCw size={14} />
-          </button>
+            <button
+              onClick={handleResetZoom}
+              className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-all cursor-pointer"
+              title="Reset View Window"
+            >
+              <RefreshCw size={14} />
+            </button>
+          </div>
         </div>
 
       </div>
 
       {/* Step Indicator Tracker */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', fontSize: '0.78rem', color: 'var(--text-dim)' }}>
+      <div className="flex items-center justify-between mb-2 text-xs text-slate-400">
         <span>
-          Step <strong>{totalSteps > 0 ? currentStepIndex + 1 : 0}</strong> of <strong>{totalSteps}</strong>
+          Step <strong className="text-cyan-300 font-mono">{totalSteps > 0 ? currentStepIndex + 1 : 0}</strong> of <strong className="text-slate-200 font-mono">{totalSteps}</strong>
         </span>
-        <span>
-          Click & drag canvas to pan • Scroll to zoom
+        <span className="hidden sm:inline text-slate-500">
+          Click &amp; drag canvas to pan • Scroll to zoom
         </span>
       </div>
 
       {/* Main Canvas Viewport */}
-      <div style={{
-        position: 'relative',
-        borderRadius: '12px',
-        overflow: 'hidden',
-        border: '1px solid var(--border-glass)',
-        cursor: isDragging ? 'grabbing' : 'grab'
-      }}>
+      <div className={`relative rounded-xl overflow-hidden border border-white/10 shadow-inner bg-slate-950 ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}>
         <canvas
           ref={canvasRef}
           width={860}
@@ -612,7 +591,7 @@ export default function GraphCanvas({
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseUp}
-          style={{ width: '100%', height: 'auto', display: 'block' }}
+          className="w-full h-auto block"
         />
       </div>
 

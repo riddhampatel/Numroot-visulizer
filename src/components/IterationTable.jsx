@@ -75,13 +75,13 @@ export default function IterationTable({
   };
 
   return (
-    <div className="glass-panel" style={{ padding: '20px', marginBottom: '24px' }}>
+    <div className="glass-panel p-4 sm:p-5 md:p-6 mb-6">
       
       {/* Table Header & Metrics */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <TableIcon size={18} color="#818cf8" />
-          <h3 style={{ fontSize: '1.05rem', fontWeight: 700 }}>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+        <div className="flex flex-wrap items-center gap-2.5">
+          <TableIcon size={18} className="text-indigo-400" />
+          <h3 className="text-sm sm:text-base font-bold text-slate-100">
             {methodName} Iteration Table
           </h3>
           {converged ? (
@@ -98,76 +98,48 @@ export default function IterationTable({
         <button
           onClick={handleExportCSV}
           disabled={!steps.length}
-          className="btn-secondary"
-          style={{ fontSize: '0.8rem', padding: '6px 14px' }}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/5 hover:bg-white/10 text-slate-200 border border-white/10 hover:border-white/20 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
           title="Download iteration history as CSV file"
         >
           <Download size={14} />
-          Export CSV
+          <span>Export CSV</span>
         </button>
       </div>
 
       {/* Derivative Formula Display (For Newton-Raphson) */}
       {derivativeFormula && (
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          padding: '8px 14px',
-          background: 'rgba(99, 102, 241, 0.08)',
-          border: '1px solid rgba(99, 102, 241, 0.25)',
-          borderRadius: '8px',
-          marginBottom: '14px',
-          fontSize: '0.82rem',
-          color: '#c7d2fe'
-        }}>
-          <FunctionSquare size={16} color="#818cf8" />
+        <div className="flex items-center gap-2 px-3.5 py-2 bg-indigo-500/10 border border-indigo-500/25 rounded-xl mb-4 text-xs text-indigo-200">
+          <FunctionSquare size={16} className="text-indigo-400 shrink-0" />
           <span>Analytical Derivative:</span>
-          <code style={{
-            fontFamily: 'var(--font-mono)',
-            fontWeight: 700,
-            color: '#a5b4fc',
-            background: 'rgba(0,0,0,0.25)',
-            padding: '2px 8px',
-            borderRadius: '4px'
-          }}>
+          <code className="font-mono font-bold text-indigo-300 bg-slate-950/50 px-2 py-0.5 rounded border border-indigo-500/20">
             f'(x) = {derivativeFormula}
           </code>
         </div>
       )}
 
       {/* Metrics Banner */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
-        gap: '12px',
-        marginBottom: '16px',
-        padding: '12px 16px',
-        background: 'rgba(255, 255, 255, 0.02)',
-        borderRadius: '10px',
-        border: '1px solid var(--border-glass)'
-      }}>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4 p-3.5 bg-slate-900/60 rounded-xl border border-white/10">
         <div>
-          <span style={{ display: 'block', fontSize: '0.72rem', color: 'var(--text-dim)', textTransform: 'uppercase' }}>Computed Root</span>
-          <strong style={{ fontSize: '1.1rem', color: '#34d399', fontFamily: 'var(--font-mono)' }}>
+          <span className="block text-[11px] text-slate-400 uppercase font-semibold">Computed Root</span>
+          <strong className="text-base sm:text-lg text-emerald-400 font-mono">
             {root !== undefined && root !== null && !isNaN(root) ? root.toFixed(7) : 'N/A'}
           </strong>
         </div>
         <div>
-          <span style={{ display: 'block', fontSize: '0.72rem', color: 'var(--text-dim)', textTransform: 'uppercase' }}>Iterations</span>
-          <strong style={{ fontSize: '1.1rem', color: 'var(--text-main)', fontFamily: 'var(--font-mono)' }}>
+          <span className="block text-[11px] text-slate-400 uppercase font-semibold">Iterations</span>
+          <strong className="text-base sm:text-lg text-slate-100 font-mono">
             {iterations ?? steps.length}
           </strong>
         </div>
         <div>
-          <span style={{ display: 'block', fontSize: '0.72rem', color: 'var(--text-dim)', textTransform: 'uppercase' }}>Target Tolerance (ε)</span>
-          <strong style={{ fontSize: '1.1rem', color: '#818cf8', fontFamily: 'var(--font-mono)' }}>
+          <span className="block text-[11px] text-slate-400 uppercase font-semibold">Target Tolerance (ε)</span>
+          <strong className="text-base sm:text-lg text-indigo-300 font-mono">
             {tolerance ? tolerance.toExponential(1) : '1.0e-5'}
           </strong>
         </div>
         <div>
-          <span style={{ display: 'block', fontSize: '0.72rem', color: 'var(--text-dim)', textTransform: 'uppercase' }}>Final Residual |f(root)|</span>
-          <strong style={{ fontSize: '1.1rem', color: '#fbbf24', fontFamily: 'var(--font-mono)' }}>
+          <span className="block text-[11px] text-slate-400 uppercase font-semibold">Final Residual |f(root)|</span>
+          <strong className="text-base sm:text-lg text-amber-300 font-mono">
             {result.finalResidual !== undefined && !isNaN(result.finalResidual)
               ? result.finalResidual.toExponential(4)
               : (steps.length > 0
@@ -179,134 +151,123 @@ export default function IterationTable({
 
       {/* Error alert if any */}
       {error && (
-        <div style={{
-          padding: '12px 16px',
-          background: 'rgba(244, 63, 94, 0.1)',
-          border: '1px solid rgba(244, 63, 94, 0.3)',
-          borderRadius: '8px',
-          color: '#fb7185',
-          fontSize: '0.85rem',
-          marginBottom: '16px'
-        }}>
+        <div className="p-3.5 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-300 text-xs sm:text-sm mb-4">
           <strong>Algorithm Notice:</strong> {error}
         </div>
       )}
 
       {/* Responsive Table Scroll Container */}
-      <div style={{ overflowX: 'auto', maxHeight: '360px', overflowY: 'auto', borderRadius: '8px', border: '1px solid var(--border-glass)' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem', fontFamily: 'var(--font-mono)', textAlign: 'left' }}>
+      <div className="overflow-x-auto max-h-96 overflow-y-auto rounded-xl border border-white/10 shadow-inner bg-slate-950/70">
+        <table className="w-full border-collapse text-xs font-mono text-left">
           <thead>
-            <tr style={{ background: '#0e1422', position: 'sticky', top: 0, zIndex: 1, borderBottom: '1px solid var(--border-glass)' }}>
-              <th style={{ padding: '10px 14px', color: 'var(--text-muted)' }}>n</th>
+            <tr className="bg-slate-900 sticky top-0 z-10 border-b border-white/10 text-slate-400 select-none">
+              <th className="py-2.5 px-3.5">n</th>
               
               {isBisection && (
                 <>
-                  <th style={{ padding: '10px 14px', color: '#22d3ee' }}>aₙ (Lower)</th>
-                  <th style={{ padding: '10px 14px', color: '#22d3ee' }}>bₙ (Upper)</th>
-                  <th style={{ padding: '10px 14px', color: '#fbbf24' }}>cₙ (Midpoint)</th>
-                  <th style={{ padding: '10px 14px', color: 'var(--text-muted)' }}>f(aₙ)</th>
-                  <th style={{ padding: '10px 14px', color: 'var(--text-muted)' }}>f(bₙ)</th>
-                  <th style={{ padding: '10px 14px', color: '#fbbf24' }}>f(cₙ)</th>
+                  <th className="py-2.5 px-3.5 text-cyan-300">aₙ (Lower)</th>
+                  <th className="py-2.5 px-3.5 text-cyan-300">bₙ (Upper)</th>
+                  <th className="py-2.5 px-3.5 text-amber-300">cₙ (Midpoint)</th>
+                  <th className="py-2.5 px-3.5 text-slate-400">f(aₙ)</th>
+                  <th className="py-2.5 px-3.5 text-slate-400">f(bₙ)</th>
+                  <th className="py-2.5 px-3.5 text-amber-300">f(cₙ)</th>
                 </>
               )}
 
               {isRegulaFalsi && (
                 <>
-                  <th style={{ padding: '10px 14px', color: '#f59e0b' }}>aₙ</th>
-                  <th style={{ padding: '10px 14px', color: '#f59e0b' }}>bₙ</th>
-                  <th style={{ padding: '10px 14px', color: '#38bdf8' }}>cₙ (Chord Root)</th>
-                  <th style={{ padding: '10px 14px', color: 'var(--text-muted)' }}>f(aₙ)</th>
-                  <th style={{ padding: '10px 14px', color: 'var(--text-muted)' }}>f(bₙ)</th>
-                  <th style={{ padding: '10px 14px', color: '#38bdf8' }}>f(cₙ)</th>
+                  <th className="py-2.5 px-3.5 text-amber-300">aₙ</th>
+                  <th className="py-2.5 px-3.5 text-amber-300">bₙ</th>
+                  <th className="py-2.5 px-3.5 text-cyan-300">cₙ (Chord Root)</th>
+                  <th className="py-2.5 px-3.5 text-slate-400">f(aₙ)</th>
+                  <th className="py-2.5 px-3.5 text-slate-400">f(bₙ)</th>
+                  <th className="py-2.5 px-3.5 text-cyan-300">f(cₙ)</th>
                 </>
               )}
 
               {isNewton && (
                 <>
-                  <th style={{ padding: '10px 14px', color: '#818cf8' }}>xₙ (Current)</th>
-                  <th style={{ padding: '10px 14px', color: 'var(--text-muted)' }}>f(xₙ)</th>
-                  <th style={{ padding: '10px 14px', color: 'var(--text-muted)' }}>f'(xₙ)</th>
-                  <th style={{ padding: '10px 14px', color: '#34d399' }}>xₙ₊₁ (Next)</th>
+                  <th className="py-2.5 px-3.5 text-indigo-300">xₙ (Current)</th>
+                  <th className="py-2.5 px-3.5 text-slate-400">f(xₙ)</th>
+                  <th className="py-2.5 px-3.5 text-slate-400">f'(xₙ)</th>
+                  <th className="py-2.5 px-3.5 text-emerald-300">xₙ₊₁ (Next)</th>
                 </>
               )}
 
               {isSecant && (
                 <>
-                  <th style={{ padding: '10px 14px', color: '#10b981' }}>xₙ₋₁</th>
-                  <th style={{ padding: '10px 14px', color: '#10b981' }}>xₙ</th>
-                  <th style={{ padding: '10px 14px', color: 'var(--text-muted)' }}>f(xₙ₋₁)</th>
-                  <th style={{ padding: '10px 14px', color: 'var(--text-muted)' }}>f(xₙ)</th>
-                  <th style={{ padding: '10px 14px', color: '#34d399' }}>xₙ₊₁</th>
+                  <th className="py-2.5 px-3.5 text-emerald-300">xₙ₋₁</th>
+                  <th className="py-2.5 px-3.5 text-emerald-300">xₙ</th>
+                  <th className="py-2.5 px-3.5 text-slate-400">f(xₙ₋₁)</th>
+                  <th className="py-2.5 px-3.5 text-slate-400">f(xₙ)</th>
+                  <th className="py-2.5 px-3.5 text-emerald-300">xₙ₊₁</th>
                 </>
               )}
 
-              <th style={{ padding: '10px 14px', color: 'var(--text-muted)' }}>Abs Error</th>
-              <th style={{ padding: '10px 14px', color: 'var(--text-muted)' }}>Rel Error %</th>
+              <th className="py-2.5 px-3.5 text-slate-400">Abs Error</th>
+              <th className="py-2.5 px-3.5 text-slate-400">Rel Error %</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-white/5">
             {steps.map((step, idx) => {
               const isActive = idx === currentStepIndex;
               return (
                 <tr
                   key={step.iteration}
                   onClick={() => onSelectStep && onSelectStep(idx)}
-                  style={{
-                    background: isActive ? 'rgba(99, 102, 241, 0.18)' : (idx % 2 === 0 ? 'rgba(255, 255, 255, 0.015)' : 'transparent'),
-                    borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
-                    cursor: 'pointer',
-                    transition: 'background 0.15s ease'
-                  }}
-                  onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'; }}
-                  onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.background = idx % 2 === 0 ? 'rgba(255, 255, 255, 0.015)' : 'transparent'; }}
+                  className={`cursor-pointer transition-colors ${
+                    isActive
+                      ? 'bg-indigo-500/20 text-indigo-100 font-semibold'
+                      : 'hover:bg-white/5 text-slate-300'
+                  }`}
                 >
-                  <td style={{ padding: '8px 14px', color: isActive ? '#818cf8' : 'var(--text-dim)', fontWeight: 600 }}>
+                  <td className={`py-2 px-3.5 ${isActive ? 'text-indigo-400 font-bold' : 'text-slate-500'}`}>
                     {step.iteration}
                   </td>
 
                   {isBisection && (
                     <>
-                      <td style={{ padding: '8px 14px', color: 'var(--text-main)' }}>{step.a.toFixed(6)}</td>
-                      <td style={{ padding: '8px 14px', color: 'var(--text-main)' }}>{step.b.toFixed(6)}</td>
-                      <td style={{ padding: '8px 14px', color: '#fbbf24', fontWeight: 600 }}>{step.c.toFixed(6)}</td>
-                      <td style={{ padding: '8px 14px', color: 'var(--text-dim)' }}>{step.fa.toExponential(3)}</td>
-                      <td style={{ padding: '8px 14px', color: 'var(--text-dim)' }}>{step.fb.toExponential(3)}</td>
-                      <td style={{ padding: '8px 14px', color: '#fbbf24' }}>{step.fc.toExponential(3)}</td>
+                      <td className="py-2 px-3.5 text-slate-200">{step.a.toFixed(6)}</td>
+                      <td className="py-2 px-3.5 text-slate-200">{step.b.toFixed(6)}</td>
+                      <td className="py-2 px-3.5 text-amber-300 font-semibold">{step.c.toFixed(6)}</td>
+                      <td className="py-2 px-3.5 text-slate-400">{step.fa.toExponential(3)}</td>
+                      <td className="py-2 px-3.5 text-slate-400">{step.fb.toExponential(3)}</td>
+                      <td className="py-2 px-3.5 text-amber-300">{step.fc.toExponential(3)}</td>
                     </>
                   )}
 
                   {isRegulaFalsi && (
                     <>
-                      <td style={{ padding: '8px 14px', color: 'var(--text-main)' }}>{step.a.toFixed(6)}</td>
-                      <td style={{ padding: '8px 14px', color: 'var(--text-main)' }}>{step.b.toFixed(6)}</td>
-                      <td style={{ padding: '8px 14px', color: '#38bdf8', fontWeight: 600 }}>{step.c.toFixed(6)}</td>
-                      <td style={{ padding: '8px 14px', color: 'var(--text-dim)' }}>{step.fa.toExponential(3)}</td>
-                      <td style={{ padding: '8px 14px', color: 'var(--text-dim)' }}>{step.fb.toExponential(3)}</td>
-                      <td style={{ padding: '8px 14px', color: '#38bdf8' }}>{step.fc.toExponential(3)}</td>
+                      <td className="py-2 px-3.5 text-slate-200">{step.a.toFixed(6)}</td>
+                      <td className="py-2 px-3.5 text-slate-200">{step.b.toFixed(6)}</td>
+                      <td className="py-2 px-3.5 text-cyan-300 font-semibold">{step.c.toFixed(6)}</td>
+                      <td className="py-2 px-3.5 text-slate-400">{step.fa.toExponential(3)}</td>
+                      <td className="py-2 px-3.5 text-slate-400">{step.fb.toExponential(3)}</td>
+                      <td className="py-2 px-3.5 text-cyan-300">{step.fc.toExponential(3)}</td>
                     </>
                   )}
 
                   {isNewton && (
                     <>
-                      <td style={{ padding: '8px 14px', color: 'var(--text-main)' }}>{step.xk.toFixed(6)}</td>
-                      <td style={{ padding: '8px 14px', color: 'var(--text-dim)' }}>{step.fxk.toExponential(3)}</td>
-                      <td style={{ padding: '8px 14px', color: 'var(--text-dim)' }}>{step.dfxk.toExponential(3)}</td>
-                      <td style={{ padding: '8px 14px', color: '#34d399', fontWeight: 600 }}>{step.xNext.toFixed(6)}</td>
+                      <td className="py-2 px-3.5 text-slate-200">{step.xk.toFixed(6)}</td>
+                      <td className="py-2 px-3.5 text-slate-400">{step.fxk.toExponential(3)}</td>
+                      <td className="py-2 px-3.5 text-slate-400">{step.dfxk.toExponential(3)}</td>
+                      <td className="py-2 px-3.5 text-emerald-300 font-semibold">{step.xNext.toFixed(6)}</td>
                     </>
                   )}
 
                   {isSecant && (
                     <>
-                      <td style={{ padding: '8px 14px', color: 'var(--text-main)' }}>{step.xPrev.toFixed(6)}</td>
-                      <td style={{ padding: '8px 14px', color: 'var(--text-main)' }}>{step.xCurr.toFixed(6)}</td>
-                      <td style={{ padding: '8px 14px', color: 'var(--text-dim)' }}>{step.fPrev.toExponential(3)}</td>
-                      <td style={{ padding: '8px 14px', color: 'var(--text-dim)' }}>{step.fCurr.toExponential(3)}</td>
-                      <td style={{ padding: '8px 14px', color: '#34d399', fontWeight: 600 }}>{step.xNext.toFixed(6)}</td>
+                      <td className="py-2 px-3.5 text-slate-200">{step.xPrev.toFixed(6)}</td>
+                      <td className="py-2 px-3.5 text-slate-200">{step.xCurr.toFixed(6)}</td>
+                      <td className="py-2 px-3.5 text-slate-400">{step.fPrev.toExponential(3)}</td>
+                      <td className="py-2 px-3.5 text-slate-400">{step.fCurr.toExponential(3)}</td>
+                      <td className="py-2 px-3.5 text-emerald-300 font-semibold">{step.xNext.toFixed(6)}</td>
                     </>
                   )}
 
-                  <td style={{ padding: '8px 14px', color: 'var(--text-dim)' }}>{step.error.toExponential(3)}</td>
-                  <td style={{ padding: '8px 14px', color: 'var(--text-dim)' }}>
+                  <td className="py-2 px-3.5 text-slate-400">{step.error.toExponential(3)}</td>
+                  <td className="py-2 px-3.5 text-slate-400">
                     {step.relativeError !== null && step.relativeError !== undefined
                       ? `${step.relativeError.toFixed(3)}%`
                       : '—'}

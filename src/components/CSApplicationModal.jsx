@@ -6,25 +6,25 @@ export default function CSApplicationModal({ isOpen, onClose }) {
 
   const applications = [
     {
-      icon: <Gamepad2 size={24} color="#38bdf8" />,
+      icon: <Gamepad2 size={24} className="text-cyan-400" />,
       title: '3D Ray Tracing & Computer Graphics',
       domain: 'Game Engines & VFX (Unreal Engine / Unity / Blender)',
       desc: 'In computer graphics ray-tracing shaders, shooting a camera ray into a parametric 3D surface (such as a torus, bezier patch, or metaball) requires finding the exact intersection point where Ray(t) - Surface(t) = 0. Newton-Raphson is implemented in GPU fragment shaders to compute sub-pixel root intersections in real time.'
     },
     {
-      icon: <Compass size={24} color="#818cf8" />,
+      icon: <Compass size={24} className="text-indigo-400" />,
       title: 'Physics Engines & Continuous Collision Detection (CCD)',
       domain: 'Robotics & Dynamic Simulations',
       desc: 'High-speed game objects often "tunnel" through walls if tested only at discrete timesteps. Continuous collision solvers formulate contact time as a continuous root-finding equation f(t_impact) = 0. Bisection provides a guaranteed bracket to avoid false misses, followed by Newton refinement for precision contact impulses.'
     },
     {
-      icon: <Brain size={24} color="#34d399" />,
+      icon: <Brain size={24} className="text-emerald-400" />,
       title: 'Machine Learning & Optimization (Second-Order Methods)',
       domain: 'Deep Learning & Convex Optimization',
       desc: 'Training machine learning models involves finding weights where the gradient of the loss function vanishes: ∇L(w) = 0. Newton-Raphson generalizes into Newton’s Optimization Method using the Hessian matrix of second derivatives, converging in a fraction of the steps required by standard first-order Gradient Descent.'
     },
     {
-      icon: <Activity size={24} color="#fbbf24" />,
+      icon: <Activity size={24} className="text-amber-400" />,
       title: 'Fast Hardware Arithmetic & Inverse Calculations',
       domain: 'Computer Architecture & Digital Signal Processing (DSP)',
       desc: 'Hardware ALUs often lack direct silicon division or square-root circuits. Instead, microcode calculates 1/D or 1/√x using 2 to 3 iterations of Newton-Raphson (such as the famous Quake Fast Inverse Square Root algorithm), replacing expensive hardware dividers with fast multiply-accumulate operations.'
@@ -32,108 +32,70 @@ export default function CSApplicationModal({ isOpen, onClose }) {
   ];
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      background: 'rgba(5, 8, 15, 0.8)',
-      backdropFilter: 'blur(8px)',
-      zIndex: 50,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '20px'
-    }}>
-      <div className="glass-panel" style={{
-        maxWidth: '750px',
-        width: '100%',
-        maxHeight: '90vh',
-        overflowY: 'auto',
-        padding: '28px',
-        background: '#0d1322',
-        border: '1px solid rgba(99, 102, 241, 0.3)',
-        position: 'relative'
-      }}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md">
+      <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto glass-panel bg-slate-900/95 border border-indigo-500/30 p-6 sm:p-8 rounded-2xl shadow-2xl shadow-black/80">
+        
         {/* Close Button */}
         <button
           onClick={onClose}
-          style={{
-            position: 'absolute',
-            top: '20px',
-            right: '20px',
-            background: 'rgba(255, 255, 255, 0.05)',
-            border: 'none',
-            borderRadius: '8px',
-            padding: '8px',
-            color: 'var(--text-muted)',
-            cursor: 'pointer'
-          }}
+          className="absolute top-5 right-5 p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors cursor-pointer"
+          title="Close modal"
         >
           <X size={20} />
         </button>
 
         {/* Modal Header */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-          <div style={{
-            width: '40px',
-            height: '40px',
-            borderRadius: '10px',
-            background: 'rgba(99, 102, 241, 0.15)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            <Cpu size={22} color="#818cf8" />
+        <div className="flex items-center gap-3.5 mb-2 pr-8">
+          <div className="w-11 h-11 rounded-xl bg-indigo-500/20 flex items-center justify-center shrink-0 border border-indigo-500/30">
+            <Cpu size={22} className="text-indigo-400" />
           </div>
           <div>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 800 }}>
+            <h2 className="text-xl font-extrabold text-white">
               Numerical Methods in Computer Science
             </h2>
-            <span style={{ fontSize: '0.8rem', color: '#22d3ee' }}>
-              How Root-Finding Powers Modern Software & Hardware Systems
+            <span className="text-xs sm:text-sm text-cyan-400 font-medium">
+              How Root-Finding Powers Modern Software &amp; Hardware Systems
             </span>
           </div>
         </div>
 
-        <p style={{ fontSize: '0.86rem', color: 'var(--text-muted)', marginBottom: '22px', lineHeight: 1.5 }}>
+        <p className="text-xs sm:text-sm text-slate-300 mb-5 leading-relaxed">
           In computer science, most analytical equations cannot be solved using closed-form algebra. Numerical root-finding transforms continuous mathematical theorems into discrete iterative algorithms executed on CPUs and GPUs.
         </p>
 
         {/* Grid of Applications */}
-        <div style={{ display: 'grid', gap: '14px' }}>
+        <div className="space-y-3.5">
           {applications.map((app, i) => (
             <div
               key={i}
-              style={{
-                padding: '16px 18px',
-                background: 'rgba(255, 255, 255, 0.02)',
-                border: '1px solid var(--border-glass)',
-                borderRadius: '12px',
-                transition: 'border-color 0.2s ease'
-              }}
+              className="p-4 sm:p-5 bg-white/2 hover:bg-white/4 border border-white/10 rounded-xl transition-all"
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '6px' }}>
-                {app.icon}
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 rounded-lg bg-slate-950/50 border border-white/5 shrink-0">
+                  {app.icon}
+                </div>
                 <div>
-                  <h3 style={{ fontSize: '0.96rem', fontWeight: 700, color: '#f1f5f9' }}>
+                  <h3 className="text-sm sm:text-base font-bold text-slate-100">
                     {app.title}
                   </h3>
-                  <span style={{ fontSize: '0.75rem', color: '#818cf8', fontWeight: 600 }}>
+                  <span className="text-xs text-indigo-300 font-medium">
                     {app.domain}
                   </span>
                 </div>
               </div>
-              <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: 1.5, marginTop: '8px' }}>
+              <p className="text-xs sm:text-sm text-slate-400 leading-relaxed mt-2">
                 {app.desc}
               </p>
             </div>
           ))}
         </div>
 
-        <div style={{ marginTop: '22px', textAlign: 'right' }}>
-          <button onClick={onClose} className="btn-primary" style={{ padding: '8px 20px', fontSize: '0.85rem' }}>
+        {/* Footer */}
+        <div className="mt-6 flex justify-end">
+          <button 
+            onClick={onClose} 
+            className="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-gradient-to-r from-indigo-500 to-cyan-500 hover:from-indigo-400 hover:to-cyan-400 text-white shadow-md shadow-indigo-500/25 active:scale-95 transition-all cursor-pointer"
+          >
             Done
           </button>
         </div>

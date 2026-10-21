@@ -125,115 +125,115 @@ export default function ConvergenceChart({
   }, [bisectionResult, regulaFalsiResult, newtonResult, secantResult]);
 
   return (
-    <div className="glass-panel" style={{ padding: '20px', marginBottom: '24px' }}>
+    <div className="glass-panel p-4 sm:p-5 md:p-6 mb-6">
       
-      {/* Title */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <Scale size={18} color="#10b981" />
-          <h3 style={{ fontSize: '1.05rem', fontWeight: 700 }}>
+      {/* Title & Legend */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+        <div className="flex items-center gap-2.5">
+          <Scale size={18} className="text-emerald-400 shrink-0" />
+          <h3 className="text-sm sm:text-base font-bold text-slate-100">
             Error Convergence Rate Analysis (Logarithmic Error Decay)
           </h3>
         </div>
 
         {/* Legend */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap', fontSize: '0.8rem' }}>
+        <div className="flex items-center gap-3.5 flex-wrap text-xs">
           {bSteps.length > 0 && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ width: '12px', height: '3px', background: '#06b6d4', borderRadius: '2px' }} />
-              <span style={{ color: '#22d3ee' }}>Bisection (p=1)</span>
+            <div className="flex items-center gap-1.5">
+              <span className="w-3 h-1 bg-cyan-400 rounded" />
+              <span className="text-cyan-300 font-medium">Bisection (p=1)</span>
             </div>
           )}
           {rfSteps.length > 0 && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ width: '12px', height: '3px', background: '#f59e0b', borderRadius: '2px' }} />
-              <span style={{ color: '#fbbf24' }}>Regula Falsi (p=1)</span>
+            <div className="flex items-center gap-1.5">
+              <span className="w-3 h-1 bg-amber-400 rounded" />
+              <span className="text-amber-300 font-medium">Regula Falsi (p=1)</span>
             </div>
           )}
           {nSteps.length > 0 && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ width: '12px', height: '3px', background: '#818cf8', borderRadius: '2px' }} />
-              <span style={{ color: '#818cf8' }}>Newton–Raphson (p=2)</span>
+            <div className="flex items-center gap-1.5">
+              <span className="w-3 h-1 bg-indigo-400 rounded" />
+              <span className="text-indigo-300 font-medium">Newton–Raphson (p=2)</span>
             </div>
           )}
           {sSteps.length > 0 && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ width: '12px', height: '3px', background: '#10b981', borderRadius: '2px' }} />
-              <span style={{ color: '#34d399' }}>Secant (p≈1.62)</span>
+            <div className="flex items-center gap-1.5">
+              <span className="w-3 h-1 bg-emerald-400 rounded" />
+              <span className="text-emerald-300 font-medium">Secant (p≈1.62)</span>
             </div>
           )}
         </div>
       </div>
 
       {/* Chart Canvas */}
-      <div style={{ width: '100%', overflow: 'hidden', borderRadius: '12px', border: '1px solid var(--border-glass)', marginBottom: '16px' }}>
+      <div className="w-full overflow-hidden rounded-xl border border-white/10 mb-4 bg-slate-950 shadow-inner">
         <canvas
           ref={canvasRef}
           width={860}
           height={260}
-          style={{ width: '100%', height: 'auto', display: 'block' }}
+          className="w-full h-auto block"
         />
       </div>
 
       {/* Comparative Analysis Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '14px' }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
         
         {/* Bisection Card */}
         {bSteps.length > 0 && (
-          <div style={{ padding: '14px 16px', background: 'rgba(6, 182, 212, 0.05)', border: '1px solid rgba(6, 182, 212, 0.2)', borderRadius: '12px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-              <strong style={{ color: '#22d3ee', fontSize: '0.9rem' }}>Bisection Method</strong>
+          <div className="p-3.5 sm:p-4 bg-cyan-950/20 border border-cyan-500/25 rounded-xl hover:border-cyan-500/40 transition-colors">
+            <div className="flex items-center justify-between mb-2">
+              <strong className="text-cyan-300 text-sm">Bisection Method</strong>
               <span className="badge badge-cyan">Linear (p = 1)</span>
             </div>
-            <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
-              • Unconditional convergence if <code className="math-mono">f(a)·f(b) &lt; 0</code>.<br />
-              • Midpoint: <code className="math-mono">c = (a + b) / 2</code>.<br />
-              • Took <strong>{bSteps.length} iterations</strong>.
+            <p className="text-xs text-slate-400 leading-relaxed space-y-1">
+              <span>• Unconditional convergence if <code className="math-mono text-cyan-300">f(a)·f(b) &lt; 0</code>.</span><br />
+              <span>• Midpoint: <code className="math-mono text-cyan-300">c = (a + b) / 2</code>.</span><br />
+              <span>• Converged in <strong className="text-white">{bSteps.length} iterations</strong>.</span>
             </p>
           </div>
         )}
 
         {/* Regula Falsi Card */}
         {rfSteps.length > 0 && (
-          <div style={{ padding: '14px 16px', background: 'rgba(245, 158, 11, 0.05)', border: '1px solid rgba(245, 158, 11, 0.2)', borderRadius: '12px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-              <strong style={{ color: '#fbbf24', fontSize: '0.9rem' }}>Regula Falsi</strong>
+          <div className="p-3.5 sm:p-4 bg-amber-950/20 border border-amber-500/25 rounded-xl hover:border-amber-500/40 transition-colors">
+            <div className="flex items-center justify-between mb-2">
+              <strong className="text-amber-300 text-sm">Regula Falsi</strong>
               <span className="badge badge-amber">Linear (Chord)</span>
             </div>
-            <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
-              • Retains bracketing safety while using chord slope.<br />
-              • Formula: <code className="math-mono">c = (a·fb - b·fa)/(fb - fa)</code>.<br />
-              • Took <strong>{rfSteps.length} iterations</strong>.
+            <p className="text-xs text-slate-400 leading-relaxed space-y-1">
+              <span>• Retains bracketing safety while using chord slope.</span><br />
+              <span>• Formula: <code className="math-mono text-amber-300">c = (a·fb - b·fa)/(fb - fa)</code>.</span><br />
+              <span>• Converged in <strong className="text-white">{rfSteps.length} iterations</strong>.</span>
             </p>
           </div>
         )}
 
         {/* Newton Card */}
         {nSteps.length > 0 && (
-          <div style={{ padding: '14px 16px', background: 'rgba(99, 102, 241, 0.05)', border: '1px solid rgba(99, 102, 241, 0.2)', borderRadius: '12px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-              <strong style={{ color: '#818cf8', fontSize: '0.9rem' }}>Newton–Raphson</strong>
+          <div className="p-3.5 sm:p-4 bg-indigo-950/20 border border-indigo-500/25 rounded-xl hover:border-indigo-500/40 transition-colors">
+            <div className="flex items-center justify-between mb-2">
+              <strong className="text-indigo-300 text-sm">Newton–Raphson</strong>
               <span className="badge badge-indigo">Quadratic (p = 2)</span>
             </div>
-            <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
-              • Rapid quadratic convergence using exact derivative <code className="math-mono">f'(x)</code>.<br />
-              • Formula: <code className="math-mono">xₙ₊₁ = xₙ - f(xₙ)/f'(xₙ)</code>.<br />
-              • Took <strong>{nSteps.length} iterations</strong>.
+            <p className="text-xs text-slate-400 leading-relaxed space-y-1">
+              <span>• Rapid quadratic convergence using exact derivative <code className="math-mono text-indigo-300">f'(x)</code>.</span><br />
+              <span>• Formula: <code className="math-mono text-indigo-300">xₙ₊₁ = xₙ - f(xₙ)/f'(xₙ)</code>.</span><br />
+              <span>• Converged in <strong className="text-white">{nSteps.length} iterations</strong>.</span>
             </p>
           </div>
         )}
 
         {/* Secant Card */}
         {sSteps.length > 0 && (
-          <div style={{ padding: '14px 16px', background: 'rgba(16, 185, 129, 0.05)', border: '1px solid rgba(16, 185, 129, 0.2)', borderRadius: '12px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-              <strong style={{ color: '#34d399', fontSize: '0.9rem' }}>Secant Method</strong>
+          <div className="p-3.5 sm:p-4 bg-emerald-950/20 border border-emerald-500/25 rounded-xl hover:border-emerald-500/40 transition-colors">
+            <div className="flex items-center justify-between mb-2">
+              <strong className="text-emerald-300 text-sm">Secant Method</strong>
               <span className="badge badge-emerald">Superlinear (p ≈ 1.62)</span>
             </div>
-            <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
-              • Approximates derivative without symbolic differentiation.<br />
-              • Formula: <code className="math-mono">xₙ₊₁ = xₙ - f(xₙ)·(xₙ - xₙ₋₁)/(f(xₙ) - f(xₙ₋₁))</code>.<br />
-              • Took <strong>{sSteps.length} iterations</strong>.
+            <p className="text-xs text-slate-400 leading-relaxed space-y-1">
+              <span>• Approximates derivative without symbolic differentiation.</span><br />
+              <span>• Formula: <code className="math-mono text-emerald-300">xₙ₊₁ = xₙ - f(xₙ)·Δx/Δf</code>.</span><br />
+              <span>• Converged in <strong className="text-white">{sSteps.length} iterations</strong>.</span>
             </p>
           </div>
         )}

@@ -151,7 +151,7 @@ export default function App() {
   };
 
   return (
-    <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '24px 20px', minHeight: '100vh' }}>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 min-h-screen flex flex-col">
       
       {/* Top Header */}
       <Header
@@ -204,7 +204,7 @@ export default function App() {
       )}
 
       {/* Iteration Tables */}
-      <div style={{ display: 'grid', gridTemplateColumns: method === 'compare' ? 'repeat(auto-fit, minmax(480px, 1fr))' : '1fr', gap: '20px' }}>
+      <div className={`grid grid-cols-1 ${method === 'compare' ? 'xl:grid-cols-2' : ''} gap-6`}>
         
         {(method === 'bisection' || method === 'compare') && bisectionResult && (
           <IterationTable
@@ -256,37 +256,15 @@ export default function App() {
       />
 
       {/* Footer */}
-      <footer style={{
-        marginTop: '36px',
-        padding: '24px 0',
-        borderTop: '1px solid var(--border-glass)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        flexWrap: 'wrap',
-        gap: '16px',
-        fontSize: '0.82rem',
-        color: 'var(--text-dim)'
-      }}>
+      <footer className="mt-auto pt-8 pb-6 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-400">
         <div>
-          <div style={{ color: 'var(--text-main)', fontWeight: 600 }}>
-            <strong>NumRoot Visualizer</strong> • Numerical Methods & Root-Finding Simulator
+          <div className="text-slate-200 font-semibold text-sm">
+            <strong>NumRoot Visualizer</strong> • Numerical Methods &amp; Root-Finding Simulator
           </div>
-          <div style={{ marginTop: '5px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', fontSize: '0.78rem' }}>
-            <span>Designed & Developed by <strong style={{ color: '#f8fafc' }}>Riddham Raiyani</strong></span>
+          <div className="mt-1 flex items-center gap-2 flex-wrap text-xs text-slate-400">
+            <span>Designed &amp; Developed by <strong className="text-white">Riddham Raiyani</strong></span>
             <span>•</span>
-            <span style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              padding: '2px 8px',
-              borderRadius: '6px',
-              background: 'rgba(56, 189, 248, 0.1)',
-              border: '1px solid rgba(56, 189, 248, 0.25)',
-              fontSize: '0.72rem',
-              color: '#38bdf8',
-              fontFamily: 'var(--font-mono)',
-              fontWeight: 600
-            }}>
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-cyan-500/10 border border-cyan-500/30 text-[11px] text-cyan-300 font-mono font-semibold">
               MIT License
             </span>
             <span>•</span>
@@ -294,16 +272,16 @@ export default function App() {
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <div className="flex items-center gap-4">
           <button
             onClick={() => setIsGuideModalOpen(true)}
-            style={{ background: 'none', border: 'none', color: '#818cf8', cursor: 'pointer', fontSize: '0.82rem' }}
+            className="text-indigo-400 hover:text-indigo-300 transition-colors cursor-pointer text-xs font-medium"
           >
             Algorithm Theory Guide
           </button>
           <button
             onClick={() => setIsCSModalOpen(true)}
-            style={{ background: 'none', border: 'none', color: '#22d3ee', cursor: 'pointer', fontSize: '0.82rem' }}
+            className="text-cyan-400 hover:text-cyan-300 transition-colors cursor-pointer text-xs font-medium"
           >
             Computing Applications
           </button>
