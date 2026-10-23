@@ -47,6 +47,24 @@ const PRESETS = [
     x0: '2.0',
     x1: '3.0',
     desc: 'x² - 5 = 0 (Calculates √5)'
+  },
+  {
+    name: 'Kepler Orbit',
+    expr: 'x - 0.2*sin(x) - 0.5',
+    a: '0',
+    b: '1',
+    x0: '0.5',
+    x1: '1.0',
+    desc: 'x - 0.2·sin(x) - 0.5 = 0'
+  },
+  {
+    name: 'Logarithmic Exam',
+    expr: 'x*ln(x) - 1.2',
+    a: '1',
+    b: '2',
+    x0: '1.5',
+    x1: '2.0',
+    desc: 'x·ln(x) - 1.2 = 0'
   }
 ];
 

@@ -29,6 +29,7 @@ export default function App() {
   const [newtonResult, setNewtonResult] = useState(null);
   const [secantResult, setSecantResult] = useState(null);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [compareVisualMethod, setCompareVisualMethod] = useState('newton');
 
   // Modals
   const [isCSModalOpen, setIsCSModalOpen] = useState(false);
@@ -191,6 +192,8 @@ export default function App() {
         secantResult={secantResult}
         currentStepIndex={currentStepIndex}
         setCurrentStepIndex={setCurrentStepIndex}
+        compareVisualMethod={compareVisualMethod}
+        setCompareVisualMethod={setCompareVisualMethod}
       />
 
       {/* Convergence Chart (Shown when any results exist) */}
@@ -211,7 +214,10 @@ export default function App() {
             result={bisectionResult}
             methodName="Bisection Method"
             currentStepIndex={currentStepIndex}
-            onSelectStep={(idx) => setCurrentStepIndex(idx)}
+            onSelectStep={(idx) => {
+              setCurrentStepIndex(idx);
+              setCompareVisualMethod('bisection');
+            }}
           />
         )}
 
@@ -220,7 +226,10 @@ export default function App() {
             result={regulaFalsiResult}
             methodName="Regula Falsi Method"
             currentStepIndex={currentStepIndex}
-            onSelectStep={(idx) => setCurrentStepIndex(idx)}
+            onSelectStep={(idx) => {
+              setCurrentStepIndex(idx);
+              setCompareVisualMethod('regula_falsi');
+            }}
           />
         )}
 
@@ -229,7 +238,10 @@ export default function App() {
             result={newtonResult}
             methodName="Newton–Raphson Method"
             currentStepIndex={currentStepIndex}
-            onSelectStep={(idx) => setCurrentStepIndex(idx)}
+            onSelectStep={(idx) => {
+              setCurrentStepIndex(idx);
+              setCompareVisualMethod('newton');
+            }}
           />
         )}
 
@@ -238,7 +250,10 @@ export default function App() {
             result={secantResult}
             methodName="Secant Method"
             currentStepIndex={currentStepIndex}
-            onSelectStep={(idx) => setCurrentStepIndex(idx)}
+            onSelectStep={(idx) => {
+              setCurrentStepIndex(idx);
+              setCompareVisualMethod('secant');
+            }}
           />
         )}
 

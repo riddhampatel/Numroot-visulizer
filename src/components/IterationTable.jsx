@@ -18,6 +18,9 @@ export default function IterationTable({
   const handleExportCSV = () => {
     if (!steps.length) return;
 
+    const fmtFix = (num, digits = 8) => (typeof num === 'number' && !isNaN(num) ? num.toFixed(digits) : 'N/A');
+    const fmtExp = (num, digits = 4) => (typeof num === 'number' && !isNaN(num) ? num.toExponential(digits) : 'N/A');
+
     let headers = [];
     let rows = [];
 
@@ -25,37 +28,37 @@ export default function IterationTable({
       headers = ['Iteration (n)', 'a_n', 'b_n', 'c_n', 'f(a_n)', 'f(b_n)', 'f(c_n)', 'Abs Error', 'Rel Error (%)'];
       rows = steps.map((s) => [
         s.iteration,
-        s.a.toFixed(8),
-        s.b.toFixed(8),
-        s.c.toFixed(8),
-        s.fa.toExponential(4),
-        s.fb.toExponential(4),
-        s.fc.toExponential(4),
-        s.error.toExponential(6),
-        s.relativeError !== null && s.relativeError !== undefined ? s.relativeError.toFixed(4) : 'N/A'
+        fmtFix(s.a),
+        fmtFix(s.b),
+        fmtFix(s.c),
+        fmtExp(s.fa),
+        fmtExp(s.fb),
+        fmtExp(s.fc),
+        fmtExp(s.error, 6),
+        s.relativeError !== null && s.relativeError !== undefined && !isNaN(s.relativeError) ? s.relativeError.toFixed(4) : 'N/A'
       ]);
     } else if (isNewton) {
       headers = ['Iteration (n)', 'x_n', 'f(x_n)', "f'(x_n)", 'x_{n+1}', 'Abs Error', 'Rel Error (%)'];
       rows = steps.map((s) => [
         s.iteration,
-        s.xk.toFixed(8),
-        s.fxk.toExponential(4),
-        s.dfxk.toExponential(4),
-        s.xNext.toFixed(8),
-        s.error.toExponential(6),
-        s.relativeError !== null && s.relativeError !== undefined ? s.relativeError.toFixed(4) : 'N/A'
+        fmtFix(s.xk),
+        fmtExp(s.fxk),
+        fmtExp(s.dfxk),
+        fmtFix(s.xNext),
+        fmtExp(s.error, 6),
+        s.relativeError !== null && s.relativeError !== undefined && !isNaN(s.relativeError) ? s.relativeError.toFixed(4) : 'N/A'
       ]);
     } else if (isSecant) {
       headers = ['Iteration (n)', 'x_{n-1}', 'x_n', 'f(x_{n-1})', 'f(x_n)', 'x_{n+1}', 'Abs Error', 'Rel Error (%)'];
       rows = steps.map((s) => [
         s.iteration,
-        s.xPrev.toFixed(8),
-        s.xCurr.toFixed(8),
-        s.fPrev.toExponential(4),
-        s.fCurr.toExponential(4),
-        s.xNext.toFixed(8),
-        s.error.toExponential(6),
-        s.relativeError !== null && s.relativeError !== undefined ? s.relativeError.toFixed(4) : 'N/A'
+        fmtFix(s.xPrev),
+        fmtFix(s.xCurr),
+        fmtExp(s.fPrev),
+        fmtExp(s.fCurr),
+        fmtFix(s.xNext),
+        fmtExp(s.error, 6),
+        s.relativeError !== null && s.relativeError !== undefined && !isNaN(s.relativeError) ? s.relativeError.toFixed(4) : 'N/A'
       ]);
     }
 

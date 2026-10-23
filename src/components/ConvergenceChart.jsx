@@ -93,7 +93,8 @@ export default function ConvergenceChart({
       ctx.beginPath();
 
       steps.forEach((s, idx) => {
-        const logErr = Math.max(minLog, Math.log10(Math.max(s.error, 1e-15)));
+        const rawErr = (typeof s.error === 'number' && !isNaN(s.error) && s.error > 0) ? s.error : 1e-15;
+        const logErr = Math.max(minLog, Math.log10(rawErr));
         const px = toX(s.iteration);
         const py = toY(logErr);
         if (idx === 0) ctx.moveTo(px, py);
@@ -103,7 +104,8 @@ export default function ConvergenceChart({
 
       ctx.fillStyle = fillColor;
       steps.forEach((s) => {
-        const logErr = Math.max(minLog, Math.log10(Math.max(s.error, 1e-15)));
+        const rawErr = (typeof s.error === 'number' && !isNaN(s.error) && s.error > 0) ? s.error : 1e-15;
+        const logErr = Math.max(minLog, Math.log10(rawErr));
         ctx.beginPath();
         ctx.arc(toX(s.iteration), toY(logErr), 3.5, 0, Math.PI * 2);
         ctx.fill();
@@ -188,7 +190,7 @@ export default function ConvergenceChart({
             <p className="text-xs text-slate-400 leading-relaxed space-y-1">
               <span>• Unconditional convergence if <code className="math-mono text-cyan-300">f(a)·f(b) &lt; 0</code>.</span><br />
               <span>• Midpoint: <code className="math-mono text-cyan-300">c = (a + b) / 2</code>.</span><br />
-              <span>• Converged in <strong className="text-white">{bSteps.length} iterations</strong>.</span>
+              <span>• {bisectionResult?.converged ? 'Converged in' : 'Halted after'} <strong className="text-white">{bSteps.length} iterations</strong>.</span>
             </p>
           </div>
         )}
@@ -203,7 +205,7 @@ export default function ConvergenceChart({
             <p className="text-xs text-slate-400 leading-relaxed space-y-1">
               <span>• Retains bracketing safety while using chord slope.</span><br />
               <span>• Formula: <code className="math-mono text-amber-300">c = (a·fb - b·fa)/(fb - fa)</code>.</span><br />
-              <span>• Converged in <strong className="text-white">{rfSteps.length} iterations</strong>.</span>
+              <span>• {regulaFalsiResult?.converged ? 'Converged in' : 'Halted after'} <strong className="text-white">{rfSteps.length} iterations</strong>.</span>
             </p>
           </div>
         )}
@@ -218,7 +220,7 @@ export default function ConvergenceChart({
             <p className="text-xs text-slate-400 leading-relaxed space-y-1">
               <span>• Rapid quadratic convergence using exact derivative <code className="math-mono text-indigo-300">f'(x)</code>.</span><br />
               <span>• Formula: <code className="math-mono text-indigo-300">xₙ₊₁ = xₙ - f(xₙ)/f'(xₙ)</code>.</span><br />
-              <span>• Converged in <strong className="text-white">{nSteps.length} iterations</strong>.</span>
+              <span>• {newtonResult?.converged ? 'Converged in' : 'Halted after'} <strong className="text-white">{nSteps.length} iterations</strong>.</span>
             </p>
           </div>
         )}
@@ -233,7 +235,7 @@ export default function ConvergenceChart({
             <p className="text-xs text-slate-400 leading-relaxed space-y-1">
               <span>• Approximates derivative without symbolic differentiation.</span><br />
               <span>• Formula: <code className="math-mono text-emerald-300">xₙ₊₁ = xₙ - f(xₙ)·Δx/Δf</code>.</span><br />
-              <span>• Converged in <strong className="text-white">{sSteps.length} iterations</strong>.</span>
+              <span>• {secantResult?.converged ? 'Converged in' : 'Halted after'} <strong className="text-white">{sSteps.length} iterations</strong>.</span>
             </p>
           </div>
         )}

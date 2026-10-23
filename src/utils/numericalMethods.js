@@ -9,16 +9,24 @@ export function compileExpression(exprStr) {
       return { compiled: null, sanitized: '', error: 'Please enter a mathematical expression.' };
     }
 
+    const funcs = new Set(['sin', 'cos', 'tan', 'asin', 'acos', 'atan', 'sinh', 'cosh', 'tanh', 'sec', 'csc', 'cot', 'exp', 'log', 'sqrt', 'abs', 'cbrt']);
+
     // Sanitize user-friendly mathematical notations:
     let sanitized = exprStr.trim()
-      // e^x or e^(...) or e^-x -> exp(...)
-      .replace(/e\^([a-zA-Z0-9()._-]+)/g, 'exp($1)')
+      // e^(...) -> exp(...) with parentheses
+      .replace(/e\^\(([^)]+)\)/g, 'exp($1)')
+      // e^-x or e^x without parentheses (minus allowed only at beginning of exponent)
+      .replace(/e\^(-?[a-zA-Z0-9_.]+)/g, 'exp($1)')
       // natural log ln(x) -> log(x) in mathjs
       .replace(/\bln\s*\(/g, 'log(')
       // Implicit multiplication with variables/parentheses: 2x -> 2*x, 3cos(x) -> 3*cos(x)
       // Negative lookbehind / careful replacement so scientific notation 1e-5 or 2e3 is preserved
       .replace(/(^|[^a-zA-Z0-9_])(\d+)\s*([a-df-zA-DF-Z(])/g, '$1$2*$3')
       .replace(/(\d+)\s*([a-df-zA-DF-Z(])/g, '$1*$2')
+      // Variable followed by parenthesis: x( -> x*(
+      .replace(/([a-zA-Z_][a-zA-Z0-9_]*)\s*\(/g, (match, p1) => {
+        return funcs.has(p1.toLowerCase()) ? match : `${p1}*(`;
+      })
       // Implicit parentheses multiplication: (x-1)(x+2) -> (x-1)*(x+2)
       .replace(/\)\s*\(/g, ')*(')
       .replace(/\)\s*([a-zA-Z0-9])/g, ')*$1');
@@ -484,6 +492,10 @@ export function runSecant({
     return { success: false, error: 'Initial estimates x₀ and x₁ must be valid numbers.' };
   }
 
+  if (Math.abs(x1 - x0) < 1e-14) {
+    return { success: false, error: 'Initial estimates x₀ and x₁ must be distinct points.' };
+  }
+
   const { compiled, error } = compileExpression(expression);
   if (error || !compiled) {
     return { success: false, error: `Invalid equation: ${error || 'Could not compile'}` };
@@ -496,6 +508,32 @@ export function runSecant({
 
   if (isNaN(fPrev) || isNaN(fCurr)) {
     return { success: false, error: `Function returned undefined at initial points x₀=${x0} or x₁=${x1}.` };
+  }
+
+  // Exact root at initial estimates
+  if (Math.abs(fPrev) < 1e-14) {
+    return {
+      success: true,
+      method: 'Secant',
+      root: x0,
+      finalResidual: 0,
+      converged: true,
+      iterations: 1,
+      steps: [{ iteration: 1, stepIndex: 0, xPrev: x0, xCurr: x1, fPrev, fCurr, xNext: x0, fxNext: 0, error: 0, relativeError: null }],
+      message: `Exact root found at initial estimate x₀ = ${x0}`
+    };
+  }
+  if (Math.abs(fCurr) < 1e-14) {
+    return {
+      success: true,
+      method: 'Secant',
+      root: x1,
+      finalResidual: 0,
+      converged: true,
+      iterations: 1,
+      steps: [{ iteration: 1, stepIndex: 0, xPrev: x0, xCurr: x1, fPrev, fCurr, xNext: x1, fxNext: 0, error: 0, relativeError: null }],
+      message: `Exact root found at initial estimate x₁ = ${x1}`
+    };
   }
 
   const steps = [];

@@ -10,12 +10,17 @@ export default function GraphCanvas({
   newtonResult,
   secantResult,
   currentStepIndex,
-  setCurrentStepIndex
+  setCurrentStepIndex,
+  compareVisualMethod: externalCompareMethod,
+  setCompareVisualMethod: setExternalCompareMethod
 }) {
   const canvasRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [viewWindow, setViewWindow] = useState({ xMin: -1, xMax: 4, yMin: -6, yMax: 10 });
-  const [compareVisualMethod, setCompareVisualMethod] = useState('newton');
+  const [internalCompareMethod, setInternalCompareMethod] = useState('newton');
+  
+  const compareVisualMethod = externalCompareMethod || internalCompareMethod;
+  const setCompareVisualMethod = setExternalCompareMethod || setInternalCompareMethod;
   const activeVisualMethod = method !== 'compare' ? method : compareVisualMethod;
 
   // Determine active result based on activeVisualMethod
@@ -29,6 +34,41 @@ export default function GraphCanvas({
   const totalSteps = activeSteps.length;
   const currentStep = activeSteps[currentStepIndex] || null;
   const calculatedRoot = activeResult?.root;
+
+  // Clamp currentStepIndex if steps length decreases
+  useEffect(() => {
+    if (totalSteps > 0 && currentStepIndex >= totalSteps) {
+      setCurrentStepIndex(totalSteps - 1);
+    }
+  }, [totalSteps, currentStepIndex, setCurrentStepIndex]);
+
+  // Canvas wheel scroll to zoom
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const onWheel = (e) => {
+      e.preventDefault();
+      const factor = e.deltaY < 0 ? 0.88 : 1.12;
+      setViewWindow((prev) => {
+        const xMid = (prev.xMin + prev.xMax) / 2;
+        const yMid = (prev.yMin + prev.yMax) / 2;
+        const xSpan = (prev.xMax - prev.xMin) * factor;
+        const ySpan = (prev.yMax - prev.yMin) * factor;
+        return {
+          xMin: xMid - xSpan / 2,
+          xMax: xMid + xSpan / 2,
+          yMin: yMid - ySpan / 2,
+          yMax: yMid + ySpan / 2
+        };
+      });
+    };
+
+    canvas.addEventListener('wheel', onWheel, { passive: false });
+    return () => {
+      canvas.removeEventListener('wheel', onWheel);
+    };
+  }, []);
 
   // Auto adjust viewport when active result root or steps change
   const rootStr = activeResult?.root !== undefined ? String(activeResult.root) : '';
